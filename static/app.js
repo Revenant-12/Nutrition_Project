@@ -170,12 +170,12 @@ function renderDashboard(data) {
             ${m.calories} kcal &bull; P: ${m.protein_g}g | C: ${m.carbs_g}g | F: ${m.fat_g}g
           </div>
         </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="copyMeal(${m.id})" title="Copy Meal" class="p-1 text-slate-400 hover:text-brand-400">
+        <div class="flex items-center space-x-1.5">
+          <button onclick="copyMeal(${m.id})" title="Copy Meal" class="p-1.5 text-slate-400 hover:text-brand-400 rounded-lg hover:bg-surface-800">
             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
           </button>
-          <button onclick="deleteMeal(${m.id})" title="Delete Meal" class="p-1 text-slate-400 hover:text-rose-400">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <button onclick="confirmDeleteMeal(${m.id}, '${m.name.replace(/'/g, "\\'")}')" title="Delete Meal" class="px-2 py-1 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 font-semibold rounded-lg border border-rose-500/25 text-[11px] flex items-center gap-1">
+            <span>🗑️</span>
           </button>
         </div>
       </div>
@@ -198,9 +198,9 @@ function renderDashboard(data) {
         <div class="flex justify-between items-center">
           <span class="font-bold text-amber-400">${w.duration_minutes} min Session</span>
           <div class="flex items-center space-x-2">
-            <span class="text-slate-400 font-semibold">${w.calories_burned} kcal burned</span>
-            <button onclick="deleteWorkout(${w.id})" title="Delete Workout" class="p-1 text-slate-400 hover:text-rose-400">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span class="text-slate-400 font-semibold">${w.calories_burned} kcal</span>
+            <button onclick="confirmDeleteWorkout(${w.id}, '${w.date_str}')" title="Delete Workout" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 font-bold rounded-lg border border-rose-500/30 text-xs flex items-center gap-1">
+              <span>🗑️</span> Delete
             </button>
           </div>
         </div>
@@ -593,11 +593,11 @@ async function loadWorkoutsHistory() {
       list.innerHTML = data.workouts.map(w => `
         <div class="bg-surface-850 p-3.5 rounded-xl border border-slate-800 text-xs space-y-1.5">
           <div class="flex justify-between items-center">
-            <span class="font-bold text-amber-400">${w.date_str} &bull; ${w.duration_minutes} min</span>
+            <span class="font-bold text-amber-400">${w.date_str} &bull; ${w.duration_minutes} min Session</span>
             <div class="flex items-center space-x-2">
               <span class="text-brand-400 font-semibold">${w.calories_burned} kcal</span>
-              <button onclick="deleteWorkout(${w.id})" title="Delete Workout" class="p-1 text-slate-400 hover:text-rose-400">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <button onclick="confirmDeleteWorkout(${w.id}, '${w.date_str}')" title="Delete Workout" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 font-bold rounded-lg border border-rose-500/30 text-xs flex items-center gap-1">
+                <span>🗑️</span> Delete
               </button>
             </div>
           </div>
@@ -613,52 +613,63 @@ async function loadWorkoutsHistory() {
   }
 }
 
-async function deleteWorkout(workoutId) {
-  if (!confirm('Are you sure you want to delete this workout?')) return;
-  try {
-    const res = await fetch(`/api/workouts/${workoutId}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-      await refreshDashboard();
-      await loadWorkoutsHistory();
+      function confirmDeleteWorkout(workoutId, info) {
+        showDeleteConfirmation(
+          'Delete Workout Session?',
+          `Are you sure you want to remove the workout logged on ${info || 'this date'}? This will also update your daily calories burned and volume tracking.`,
+          async () => {
+            try {
+              const res = await fetch(`/api/workouts/${workoutId}`, { method: 'DELETE' });
+              const data = await res.json();
+              if (data.success) {
+                await refreshDashboard();
+                await loadWorkoutsHistory();
+              } else {
+                alert('Could not delete workout: ' + (data.detail || 'Error'));
+              }
+            } catch (err) {
+              alert('Failed to delete workout: ' + err);
+            }
+          }
+  );
     }
-  } catch (err) {
-    alert('Failed to delete workout: ' + err);
-  }
-}
 
-// --- Gemini Machine Identifier ---
+    async function deleteWorkout(workoutId) {
+      confirmDeleteWorkout(workoutId, 'this session');
+    }
 
-function openMachineIdentifierModal() {
-  document.getElementById('machineIdentifierModal').classList.remove('hidden');
-  document.getElementById('machineIdentifyResult').classList.add('hidden');
-}
+    // --- Gemini Machine Identifier ---
 
-async function executeIdentifyMachine() {
-  const fileInput = document.getElementById('machineImageFileInput');
-  if (!fileInput.files || fileInput.files.length === 0) {
-    alert('Please choose or snap a photo of the gym machine.');
-    return;
-  }
+    function openMachineIdentifierModal() {
+      document.getElementById('machineIdentifierModal').classList.remove('hidden');
+      document.getElementById('machineIdentifyResult').classList.add('hidden');
+    }
 
-  const btn = document.getElementById('identifyMachineBtn');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-spin inline-block mr-1">&#9696;</span> Gemini Vision analyzing machine...`;
+    async function executeIdentifyMachine() {
+      const fileInput = document.getElementById('machineImageFileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please choose or snap a photo of the gym machine.');
+        return;
+      }
 
-  const formData = new FormData();
-  formData.append('image', fileInput.files[0]);
+      const btn = document.getElementById('identifyMachineBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">&#9696;</span> Gemini Vision analyzing machine...`;
 
-  try {
-    const res = await fetch('/api/vision/identify-machine', {
-      method: 'POST',
-      body: formData,
-    });
-    const result = await res.json();
-    if (result.success && result.data) {
-      const data = result.data;
-      const resBox = document.getElementById('machineIdentifyResult');
-      resBox.classList.remove('hidden');
-      resBox.innerHTML = `
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      try {
+        const res = await fetch('/api/vision/identify-machine', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await res.json();
+        if (result.success && result.data) {
+          const data = result.data;
+          const resBox = document.getElementById('machineIdentifyResult');
+          resBox.classList.remove('hidden');
+          resBox.innerHTML = `
         <h4 class="font-bold text-brand-400 text-sm">${data.machine_name || 'Machine Detected'}</h4>
         <p class="text-[11px] text-slate-300"><strong>Exercise:</strong> ${data.exercise_name || data.machine_name}</p>
         <p class="text-[11px] text-slate-300"><strong>Primary Muscles:</strong> ${(data.primary_muscles || []).join(', ')}</p>
@@ -667,89 +678,89 @@ async function executeIdentifyMachine() {
           Add This Exercise to Workout
         </button>
       `;
-    } else {
-      alert('Recognition issue: ' + (result.error || 'Could not recognize equipment'));
+        } else {
+          alert('Recognition issue: ' + (result.error || 'Could not recognize equipment'));
+        }
+      } catch (err) {
+        alert('Gemini API call failed: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> Identify Machine & Target Muscles`;
+        if (window.lucide) lucide.createIcons();
+      }
     }
-  } catch (err) {
-    alert('Gemini API call failed: ' + err);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> Identify Machine & Target Muscles`;
-    if (window.lucide) lucide.createIcons();
-  }
-}
 
-function addIdentifiedMachineToWorkout(name, muscles) {
-  closeModal('machineIdentifierModal');
-  addExerciseToActiveWorkout(name, 'strength', muscles);
-}
-
-// --- Gemini Nutrition Label Scanner ---
-
-function openLabelScannerModal() {
-  document.getElementById('labelScannerModal').classList.remove('hidden');
-  document.getElementById('labelScanStatus').classList.add('hidden');
-}
-
-async function executeScanNutritionLabel() {
-  const fileInput = document.getElementById('labelImageFileInput');
-  if (!fileInput.files || fileInput.files.length === 0) {
-    alert('Please select or capture a photo of the nutrition label.');
-    return;
-  }
-
-  const btn = document.getElementById('scanLabelBtn');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-spin inline-block mr-1">&#9696;</span> Extracting facts from label...`;
-
-  const formData = new FormData();
-  formData.append('image', fileInput.files[0]);
-
-  try {
-    const res = await fetch('/api/vision/scan-label', {
-      method: 'POST',
-      body: formData,
-    });
-    const result = await res.json();
-    if (result.success && result.data) {
-      const data = result.data;
-      closeModal('labelScannerModal');
-      openLogMealModal();
-      document.getElementById('mealNameInput').value = data.product_name || 'Scanned Food Item';
-      document.getElementById('mealCalInput').value = data.calories || 0;
-      document.getElementById('mealProteinInput').value = data.protein_g || 0;
-      document.getElementById('mealCarbsInput').value = data.carbs_g || 0;
-      document.getElementById('mealFatInput').value = data.fat_g || 0;
-    } else {
-      alert('Label extraction issue: ' + (result.error || 'Could not extract nutrition facts'));
+    function addIdentifiedMachineToWorkout(name, muscles) {
+      closeModal('machineIdentifierModal');
+      addExerciseToActiveWorkout(name, 'strength', muscles);
     }
-  } catch (err) {
-    alert('Gemini API label scan failed: ' + err);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> Analyze Label Photo`;
-    if (window.lucide) lucide.createIcons();
-  }
-}
 
-// --- Meal Logging & Food Database Search ---
+    // --- Gemini Nutrition Label Scanner ---
 
-function openLogMealModal() {
-  document.getElementById('logMealModal').classList.remove('hidden');
-}
+    function openLabelScannerModal() {
+      document.getElementById('labelScannerModal').classList.remove('hidden');
+      document.getElementById('labelScanStatus').classList.add('hidden');
+    }
 
-async function handleFoodSearch() {
-  const q = document.getElementById('foodSearchInput').value.trim();
-  if (!q) return;
+    async function executeScanNutritionLabel() {
+      const fileInput = document.getElementById('labelImageFileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select or capture a photo of the nutrition label.');
+        return;
+      }
 
-  const resultsDiv = document.getElementById('foodSearchResults');
-  resultsDiv.innerHTML = `<p class="text-xs text-slate-400 py-1">Searching food databases...</p>`;
+      const btn = document.getElementById('scanLabelBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">&#9696;</span> Extracting facts from label...`;
 
-  try {
-    const res = await fetch(`/api/foods/search?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-    if (data.results && data.results.length > 0) {
-      resultsDiv.innerHTML = data.results.map(item => `
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      try {
+        const res = await fetch('/api/vision/scan-label', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await res.json();
+        if (result.success && result.data) {
+          const data = result.data;
+          closeModal('labelScannerModal');
+          openLogMealModal();
+          document.getElementById('mealNameInput').value = data.product_name || 'Scanned Food Item';
+          document.getElementById('mealCalInput').value = data.calories || 0;
+          document.getElementById('mealProteinInput').value = data.protein_g || 0;
+          document.getElementById('mealCarbsInput').value = data.carbs_g || 0;
+          document.getElementById('mealFatInput').value = data.fat_g || 0;
+        } else {
+          alert('Label extraction issue: ' + (result.error || 'Could not extract nutrition facts'));
+        }
+      } catch (err) {
+        alert('Gemini API label scan failed: ' + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> Analyze Label Photo`;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    // --- Meal Logging & Food Database Search ---
+
+    function openLogMealModal() {
+      document.getElementById('logMealModal').classList.remove('hidden');
+    }
+
+    async function handleFoodSearch() {
+      const q = document.getElementById('foodSearchInput').value.trim();
+      if (!q) return;
+
+      const resultsDiv = document.getElementById('foodSearchResults');
+      resultsDiv.innerHTML = `<p class="text-xs text-slate-400 py-1">Searching food databases...</p>`;
+
+      try {
+        const res = await fetch(`/api/foods/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (data.results && data.results.length > 0) {
+          resultsDiv.innerHTML = data.results.map(item => `
         <div class="flex justify-between items-center p-2 bg-surface-850 hover:bg-slate-700/60 rounded-lg border border-slate-800 cursor-pointer text-xs" onclick='selectFoodItem(${JSON.stringify(item)})'>
           <div>
             <span class="font-bold text-white">${item.name}</span>
@@ -758,103 +769,125 @@ async function handleFoodSearch() {
           <span class="text-[11px] text-brand-400 font-bold">Select</span>
         </div>
       `).join('');
-    } else {
-      resultsDiv.innerHTML = `<p class="text-xs text-slate-500 py-1">No matching food found. You can enter manually below.</p>`;
+        } else {
+          resultsDiv.innerHTML = `<p class="text-xs text-slate-500 py-1">No matching food found. You can enter manually below.</p>`;
+        }
+      } catch (err) {
+        resultsDiv.innerHTML = `<p class="text-xs text-rose-400 py-1">Search failed.</p>`;
+      }
     }
-  } catch (err) {
-    resultsDiv.innerHTML = `<p class="text-xs text-rose-400 py-1">Search failed.</p>`;
-  }
-}
 
-function selectFoodItem(item) {
-  document.getElementById('mealNameInput').value = item.name;
-  document.getElementById('mealCalInput').value = item.calories_per_100g;
-  document.getElementById('mealProteinInput').value = item.protein_per_100g;
-  document.getElementById('mealCarbsInput').value = item.carbs_per_100g;
-  document.getElementById('mealFatInput').value = item.fat_per_100g;
-  document.getElementById('foodSearchResults').innerHTML = '';
-}
-
-async function handleLogMealSubmit(e) {
-  e.preventDefault();
-  const name = document.getElementById('mealNameInput').value;
-  const cal = parseFloat(document.getElementById('mealCalInput').value);
-  const p = parseFloat(document.getElementById('mealProteinInput').value);
-  const c = parseFloat(document.getElementById('mealCarbsInput').value);
-  const f = parseFloat(document.getElementById('mealFatInput').value);
-
-  try {
-    const res = await fetch('/api/meals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name,
-        calories: cal,
-        protein_g: p,
-        carbs_g: c,
-        fat_g: f,
-      }),
-    });
-    const result = await res.json();
-    if (result.success) {
-      closeModal('logMealModal');
-      document.getElementById('logMealForm').reset();
-      await refreshDashboard();
+    function selectFoodItem(item) {
+      document.getElementById('mealNameInput').value = item.name;
+      document.getElementById('mealCalInput').value = item.calories_per_100g;
+      document.getElementById('mealProteinInput').value = item.protein_per_100g;
+      document.getElementById('mealCarbsInput').value = item.carbs_per_100g;
+      document.getElementById('mealFatInput').value = item.fat_per_100g;
+      document.getElementById('foodSearchResults').innerHTML = '';
     }
-  } catch (err) {
-    alert('Error logging meal: ' + err);
-  }
-}
 
-async function copyMeal(mealId) {
-  try {
-    const res = await fetch('/api/meals/copy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ meal_id: mealId }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      await refreshDashboard();
+    async function handleLogMealSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('mealNameInput').value;
+      const cal = parseFloat(document.getElementById('mealCalInput').value);
+      const p = parseFloat(document.getElementById('mealProteinInput').value);
+      const c = parseFloat(document.getElementById('mealCarbsInput').value);
+      const f = parseFloat(document.getElementById('mealFatInput').value);
+
+      try {
+        const res = await fetch('/api/meals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            calories: cal,
+            protein_g: p,
+            carbs_g: c,
+            fat_g: f,
+          }),
+        });
+        const result = await res.json();
+        if (result.success) {
+          closeModal('logMealModal');
+          document.getElementById('logMealForm').reset();
+          await refreshDashboard();
+        }
+      } catch (err) {
+        alert('Error logging meal: ' + err);
+      }
     }
-  } catch (err) {
-    alert('Failed to copy meal');
-  }
-}
 
-async function deleteMeal(mealId) {
-  if (!confirm('Remove this logged meal?')) return;
-  try {
-    await fetch(`/api/meals/${mealId}`, { method: 'DELETE' });
-    await refreshDashboard();
-  } catch (err) {
-    alert('Failed to delete meal');
-  }
-}
+    async function copyMeal(mealId) {
+      try {
+        const res = await fetch('/api/meals/copy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ meal_id: mealId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await refreshDashboard();
+        }
+      } catch (err) {
+        alert('Failed to copy meal');
+      }
+    }
 
-// --- Recipe Creation & Scaling (Section 4.1) ---
+    // --- In-App Confirmation Modal (Universal, No OS window.confirm) ---
 
-let currentRecipeIngredients = [];
+    function showDeleteConfirmation(title, message, onConfirmCallback) {
+      document.getElementById('confirmDeleteTitle').textContent = title;
+      document.getElementById('confirmDeleteMessage').textContent = message;
+      const actionBtn = document.getElementById('confirmDeleteActionBtn');
+      actionBtn.onclick = async () => {
+        closeModal('confirmDeleteModal');
+        if (onConfirmCallback) await onConfirmCallback();
+      };
+      document.getElementById('confirmDeleteModal').classList.remove('hidden');
+    }
 
-function openCreateRecipeModal() {
-  document.getElementById('createRecipeModal').classList.remove('hidden');
-  currentRecipeIngredients = [];
-  addRecipeIngredientRow();
-}
+    function confirmDeleteMeal(mealId, mealName) {
+      showDeleteConfirmation(
+        'Delete Meal Entry?',
+        `Are you sure you want to remove "${mealName || 'this meal'}" from today's log?`,
+        async () => {
+          try {
+            await fetch(`/api/meals/${mealId}`, { method: 'DELETE' });
+            await refreshDashboard();
+          } catch (err) {
+            alert('Failed to delete meal: ' + err);
+          }
+        }
+      );
+    }
 
-function addRecipeIngredientRow() {
-  currentRecipeIngredients.push({ name: '', weight_g: 100, calories: 150, protein_g: 20, carbs_g: 5, fat_g: 2 });
-  renderRecipeIngredientRows();
-}
+    async function deleteMeal(mealId) {
+      confirmDeleteMeal(mealId, 'this meal');
+    }
 
-function removeRecipeIngredientRow(idx) {
-  currentRecipeIngredients.splice(idx, 1);
-  renderRecipeIngredientRows();
-}
+    // --- Recipe Creation & Scaling (Section 4.1) ---
 
-function renderRecipeIngredientRows() {
-  const container = document.getElementById('recipeIngredientsRows');
-  container.innerHTML = currentRecipeIngredients.map((ing, idx) => `
+    let currentRecipeIngredients = [];
+
+    function openCreateRecipeModal() {
+      document.getElementById('createRecipeModal').classList.remove('hidden');
+      currentRecipeIngredients = [];
+      addRecipeIngredientRow();
+    }
+
+    function addRecipeIngredientRow() {
+      currentRecipeIngredients.push({ name: '', weight_g: 100, calories: 150, protein_g: 20, carbs_g: 5, fat_g: 2 });
+      renderRecipeIngredientRows();
+    }
+
+    function removeRecipeIngredientRow(idx) {
+      currentRecipeIngredients.splice(idx, 1);
+      renderRecipeIngredientRows();
+    }
+
+    function renderRecipeIngredientRows() {
+      const container = document.getElementById('recipeIngredientsRows');
+      container.innerHTML = currentRecipeIngredients.map((ing, idx) => `
     <div class="bg-surface-850 p-2.5 rounded-xl border border-slate-800 space-y-1.5 text-xs">
       <div class="flex space-x-1.5 items-center">
         <input type="text" placeholder="Ingredient name (e.g. Chicken breast)" value="${ing.name}" onchange="updateRecipeIng(${idx}, 'name', this.value)" class="flex-1 bg-surface-900 border border-slate-700 rounded p-1 text-white" />
@@ -881,207 +914,220 @@ function renderRecipeIngredientRows() {
     </div>
   `).join('');
 
-  // Total Batch Weight calculation (Pseudocode Section 4.1.4.1)
-  const totalBatchWeight = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.weight_g) || 0), 0);
-  const totalBatchCal = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.calories) || 0), 0);
-  document.getElementById('recipeBatchWeightDisplay').textContent = `${Math.round(totalBatchWeight)} g`;
-  document.getElementById('recipeBatchCalDisplay').textContent = `${Math.round(totalBatchCal)} kcal`;
-}
-
-function updateRecipeIng(idx, field, val) {
-  currentRecipeIngredients[idx][field] = field === 'name' ? val : (parseFloat(val) || 0);
-  if (field === 'weight_g' || field === 'calories') {
-    const totalBatchWeight = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.weight_g) || 0), 0);
-    const totalBatchCal = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.calories) || 0), 0);
-    document.getElementById('recipeBatchWeightDisplay').textContent = `${Math.round(totalBatchWeight)} g`;
-    document.getElementById('recipeBatchCalDisplay').textContent = `${Math.round(totalBatchCal)} kcal`;
-  }
-}
-
-async function handleCreateRecipeSubmit(e) {
-  e.preventDefault();
-  const name = document.getElementById('recipeNameInput').value;
-  const category = document.getElementById('recipeCategoryInput').value;
-  const addToSafe = document.getElementById('recipeAddToSafeFoods').checked;
-
-  const validIngredients = currentRecipeIngredients.filter(i => i.name.trim());
-  if (validIngredients.length === 0) {
-    alert('Please add at least one ingredient.');
-    return;
-  }
-
-  const payload = {
-    name: name,
-    meal_type: category,
-    ingredients: validIngredients,
-    add_to_safe_foods: addToSafe,
-    safe_ranking: 'safe',
-  };
-
-  try {
-    const res = await fetch('/api/recipes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const result = await res.json();
-    if (result.success) {
-      closeModal('createRecipeModal');
-      await loadCookbook();
-      await loadSafeFoods();
+      // Total Batch Weight calculation (Pseudocode Section 4.1.4.1)
+      const totalBatchWeight = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.weight_g) || 0), 0);
+      const totalBatchCal = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.calories) || 0), 0);
+      document.getElementById('recipeBatchWeightDisplay').textContent = `${Math.round(totalBatchWeight)} g`;
+      document.getElementById('recipeBatchCalDisplay').textContent = `${Math.round(totalBatchCal)} kcal`;
     }
-  } catch (err) {
-    alert('Error saving recipe: ' + err);
-  }
-}
 
-async function loadCookbook() {
-  try {
-    const res = await fetch('/api/recipes');
-    const data = await res.json();
-    appState.recipes = data.recipes || [];
-    const list = document.getElementById('cookbookList');
-    if (appState.recipes.length > 0) {
-      list.innerHTML = appState.recipes.map(r => `
-        <div class="bg-surface-850 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+    function updateRecipeIng(idx, field, val) {
+      currentRecipeIngredients[idx][field] = field === 'name' ? val : (parseFloat(val) || 0);
+      if (field === 'weight_g' || field === 'calories') {
+        const totalBatchWeight = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.weight_g) || 0), 0);
+        const totalBatchCal = currentRecipeIngredients.reduce((sum, i) => sum + (parseFloat(i.calories) || 0), 0);
+        document.getElementById('recipeBatchWeightDisplay').textContent = `${Math.round(totalBatchWeight)} g`;
+        document.getElementById('recipeBatchCalDisplay').textContent = `${Math.round(totalBatchCal)} kcal`;
+      }
+    }
+
+    async function handleCreateRecipeSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('recipeNameInput').value;
+      const category = document.getElementById('recipeCategoryInput').value;
+      const addToSafe = document.getElementById('recipeAddToSafeFoods').checked;
+
+      const validIngredients = currentRecipeIngredients.filter(i => i.name.trim());
+      if (validIngredients.length === 0) {
+        alert('Please add at least one ingredient.');
+        return;
+      }
+
+      const payload = {
+        name: name,
+        meal_type: category,
+        ingredients: validIngredients,
+        add_to_safe_foods: addToSafe,
+        safe_ranking: 'safe',
+      };
+
+      try {
+        const res = await fetch('/api/recipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json();
+        if (result.success) {
+          closeModal('createRecipeModal');
+          await loadCookbook();
+          await loadSafeFoods();
+        }
+      } catch (err) {
+        alert('Error saving recipe: ' + err);
+      }
+    }
+
+    async function loadCookbook() {
+      try {
+        const res = await fetch('/api/recipes');
+        const data = await res.json();
+        appState.recipes = data.recipes || [];
+        const list = document.getElementById('cookbookList');
+        if (appState.recipes.length > 0) {
+          list.innerHTML = appState.recipes.map(r => `
+        <div class="bg-surface-850 p-4 rounded-xl border border-slate-800 space-y-2.5 text-xs">
           <div class="flex justify-between items-start">
             <div>
               <h4 class="font-bold text-white text-sm">${r.name}</h4>
-              <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded uppercase font-semibold">${r.meal_type}</span>
+              <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded uppercase font-semibold mt-0.5 inline-block">${r.meal_type}</span>
             </div>
-            <button onclick="deleteRecipe(${r.id})" title="Delete Recipe" class="p-1 text-slate-400 hover:text-rose-400">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
           </div>
           <div class="text-slate-300 text-[11px] space-y-0.5">
             <p><strong>Batch:</strong> ${r.batch_weight_g}g &bull; ${r.total_calories} kcal</p>
             <p>P: ${r.total_protein_g}g | C: ${r.total_carbs_g}g | F: ${r.total_fat_g}g</p>
           </div>
-          <button onclick="openPortionRecipeModal(${r.id})" class="w-full py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 font-bold rounded-lg border border-brand-500/30">
-            Log Portion Eaten
-          </button>
+          <div class="flex space-x-2 pt-1">
+            <button onclick="openPortionRecipeModal(${r.id})" class="flex-1 py-2 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 font-bold rounded-lg border border-brand-500/30 text-xs">
+              Log Portion Eaten
+            </button>
+            <button onclick="confirmDeleteRecipe(${r.id}, '${r.name.replace(/'/g, "\\'")}')" class="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 font-bold rounded-lg border border-rose-500/30 text-xs flex items-center gap-1" title="Delete Recipe">
+              <span>🗑️</span> Delete
+            </button>
+          </div>
         </div>
       `).join('');
-    } else {
-      list.innerHTML = `<p class="col-span-2 text-xs text-slate-500 py-6 text-center">No recipes in cookbook. Tap "+ Add Recipe" to batch-scale your first meal.</p>`;
+        } else {
+          list.innerHTML = `<p class="col-span-2 text-xs text-slate-500 py-6 text-center">No recipes in cookbook. Tap "+ Add Recipe" to batch-scale your first meal.</p>`;
+        }
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading cookbook', err);
+      }
     }
-    if (window.lucide) lucide.createIcons();
-  } catch (err) {
-    console.error('Error loading cookbook', err);
-  }
-}
 
-async function deleteRecipe(recipeId) {
-  if (!confirm('Are you sure you want to delete this recipe?')) return;
-  try {
-    const res = await fetch(`/api/recipes/${recipeId}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (data.success) {
-      await loadCookbook();
-    }
-  } catch (err) {
-    alert('Failed to delete recipe: ' + err);
-  }
-}
+          function confirmDeleteRecipe(recipeId, recipeName) {
+            showDeleteConfirmation(
+              'Delete Recipe?',
+              `Are you sure you want to remove "${recipeName || 'this recipe'}" from your cookbook?`,
+              async () => {
+                try {
+                  const res = await fetch(`/api/recipes/${recipeId}`, { method: 'DELETE' });
+                  const data = await res.json();
+                  if (data.success) {
+                    await loadCookbook();
+                  } else {
+                    alert('Could not delete recipe: ' + (data.detail || 'Error'));
+                  }
+                } catch (err) {
+                  alert('Failed to delete recipe: ' + err);
+                }
+              }
+  );
+        }
 
-// --- Recipe Portioned Meal Logging (Section 4.1.4) ---
+        async function deleteRecipe(recipeId) {
+          confirmDeleteRecipe(recipeId, 'this recipe');
+        }
 
-function openPortionRecipeModal(preselectedId) {
-  document.getElementById('portionRecipeModal').classList.remove('hidden');
-  const sel = document.getElementById('portionRecipeSelect');
-  sel.innerHTML = appState.recipes.map(r => `
+        // --- Recipe Portioned Meal Logging (Section 4.1.4) ---
+
+        function openPortionRecipeModal(preselectedId) {
+          document.getElementById('portionRecipeModal').classList.remove('hidden');
+          const sel = document.getElementById('portionRecipeSelect');
+          sel.innerHTML = appState.recipes.map(r => `
     <option value="${r.id}" ${preselectedId === r.id ? 'selected' : ''}>${r.name} (Batch: ${r.batch_weight_g}g)</option>
   `).join('');
-  updatePortionPreview();
-}
+          updatePortionPreview();
+        }
 
-function updatePortionPreview() {
-  const sel = document.getElementById('portionRecipeSelect');
-  const recipeId = parseInt(sel.value);
-  const portionGrams = parseFloat(document.getElementById('portionWeightGrams').value) || 0;
-  const recipe = appState.recipes.find(r => r.id === recipeId);
-  const preview = document.getElementById('portionCalculationPreview');
+        function updatePortionPreview() {
+          const sel = document.getElementById('portionRecipeSelect');
+          const recipeId = parseInt(sel.value);
+          const portionGrams = parseFloat(document.getElementById('portionWeightGrams').value) || 0;
+          const recipe = appState.recipes.find(r => r.id === recipeId);
+          const preview = document.getElementById('portionCalculationPreview');
 
-  if (!recipe || portionGrams <= 0) {
-    preview.innerHTML = `<p class="text-slate-400">Enter portion weight to calculate scaled macros.</p>`;
-    return;
-  }
+          if (!recipe || portionGrams <= 0) {
+            preview.innerHTML = `<p class="text-slate-400">Enter portion weight to calculate scaled macros.</p>`;
+            return;
+          }
 
-  const fraction = portionGrams / (recipe.batch_weight_g || portionGrams);
-  const cal = Math.round(recipe.total_calories * fraction);
-  const p = Math.round(recipe.total_protein_g * fraction * 10) / 10;
-  const c = Math.round(recipe.total_carbs_g * fraction * 10) / 10;
-  const f = Math.round(recipe.total_fat_g * fraction * 10) / 10;
+          const fraction = portionGrams / (recipe.batch_weight_g || portionGrams);
+          const cal = Math.round(recipe.total_calories * fraction);
+          const p = Math.round(recipe.total_protein_g * fraction * 10) / 10;
+          const c = Math.round(recipe.total_carbs_g * fraction * 10) / 10;
+          const f = Math.round(recipe.total_fat_g * fraction * 10) / 10;
 
-  preview.innerHTML = `
+          preview.innerHTML = `
     <div class="flex justify-between font-bold text-white">
       <span>Fraction of Batch: ${(fraction * 100).toFixed(1)}%</span>
       <span class="text-brand-400">${cal} kcal</span>
     </div>
     <p class="text-[11px] text-slate-300">P: ${p}g | C: ${c}g | F: ${f}g</p>
   `;
-}
+        }
 
-async function executeLogRecipePortion() {
-  const sel = document.getElementById('portionRecipeSelect');
-  const recipeId = parseInt(sel.value);
-  const portionGrams = parseFloat(document.getElementById('portionWeightGrams').value);
-  if (!portionGrams || portionGrams <= 0) {
-    alert('Please enter a portion weight in grams.');
-    return;
-  }
+        async function executeLogRecipePortion() {
+          const sel = document.getElementById('portionRecipeSelect');
+          const recipeId = parseInt(sel.value);
+          const portionGrams = parseFloat(document.getElementById('portionWeightGrams').value);
+          if (!portionGrams || portionGrams <= 0) {
+            alert('Please enter a portion weight in grams.');
+            return;
+          }
 
-  try {
-    const res = await fetch('/api/meals/log-recipe-portion', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipe_id: recipeId,
-        portion_weight_g: portionGrams,
-      }),
-    });
-    const result = await res.json();
-    if (result.success) {
-      closeModal('portionRecipeModal');
-      await refreshDashboard();
-      switchTab('dashboard');
-    }
-  } catch (err) {
-    alert('Failed to log portion: ' + err);
-  }
-}
+          try {
+            const res = await fetch('/api/meals/log-recipe-portion', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                recipe_id: recipeId,
+                portion_weight_g: portionGrams,
+              }),
+            });
+            const result = await res.json();
+            if (result.success) {
+              closeModal('portionRecipeModal');
+              await refreshDashboard();
+              switchTab('dashboard');
+            }
+          } catch (err) {
+            alert('Failed to log portion: ' + err);
+          }
+        }
 
-// --- Smart Recipe Recommendation (Section 4.2) ---
+        // --- Smart Recipe Recommendation (Section 4.2) ---
 
-function openRecommendRecipeModal() {
-  document.getElementById('recommendRecipeModal').classList.remove('hidden');
-}
+        function openRecommendRecipeModal() {
+          document.getElementById('recommendRecipeModal').classList.remove('hidden');
+        }
 
-async function executeRecipeRecommendation() {
-  const mealType = document.getElementById('recMealType').value;
-  const prioritize = document.getElementById('recPrioritize').value;
-  const filterMode = document.getElementById('recFilterMode').value;
-  const familiar = document.getElementById('recFamiliarOnly').checked;
+        async function executeRecipeRecommendation() {
+          const mealType = document.getElementById('recMealType').value;
+          const prioritize = document.getElementById('recPrioritize').value;
+          const filterMode = document.getElementById('recFilterMode').value;
+          const familiar = document.getElementById('recFamiliarOnly').checked;
 
-  const payload = {
-    meal_type: mealType,
-    prioritize: prioritize,
-    filter_mode: filterMode,
-    prefer_familiar: familiar,
-    use_safe_foods: true,
-  };
+          const payload = {
+            meal_type: mealType,
+            prioritize: prioritize,
+            filter_mode: filterMode,
+            prefer_familiar: familiar,
+            use_safe_foods: true,
+          };
 
-  try {
-    const res = await fetch('/api/recipes/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    const resultsDiv = document.getElementById('recipeRecommendationResults');
+          try {
+            const res = await fetch('/api/recipes/recommend', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            const resultsDiv = document.getElementById('recipeRecommendationResults');
 
-    if (data.recipes && data.recipes.length > 0) {
-      resultsDiv.innerHTML = data.recipes.map((r, i) => `
+            if (data.recipes && data.recipes.length > 0) {
+              resultsDiv.innerHTML = data.recipes.map((r, i) => `
         <div class="bg-surface-850 p-3 rounded-xl border border-slate-800 space-y-1 text-xs">
           <div class="flex justify-between items-center">
             <span class="font-bold text-white">${i + 1}. ${r.name}</span>
@@ -1098,189 +1144,189 @@ async function executeRecipeRecommendation() {
           </div>
         </div>
       `).join('');
-    } else {
-      resultsDiv.innerHTML = `<p class="text-xs text-slate-500 py-3 text-center">No matching recipes found under criteria.</p>`;
-    }
-  } catch (err) {
-    alert('Recommendation query failed: ' + err);
-  }
-}
+            } else {
+              resultsDiv.innerHTML = `<p class="text-xs text-slate-500 py-3 text-center">No matching recipes found under criteria.</p>`;
+            }
+          } catch (err) {
+            alert('Recommendation query failed: ' + err);
+          }
+        }
 
-// --- Safe Food Tracker List (Section 1.1.7) ---
+        // --- Safe Food Tracker List (Section 1.1.7) ---
 
-async function loadSafeFoods() {
-  try {
-    const res = await fetch('/api/safe-foods');
-    const data = await res.json();
-    appState.safeFoods = data.safe_foods || [];
-    const container = document.getElementById('safeFoodBadges');
+        async function loadSafeFoods() {
+          try {
+            const res = await fetch('/api/safe-foods');
+            const data = await res.json();
+            appState.safeFoods = data.safe_foods || [];
+            const container = document.getElementById('safeFoodBadges');
 
-    if (appState.safeFoods.length > 0) {
-      container.innerHTML = appState.safeFoods.map(f => {
-        let badgeColor = 'bg-brand-500/20 text-brand-300 border-brand-500/30';
-        if (f.ranking === 'mostly_safe') badgeColor = 'bg-slate-800 text-slate-300 border-slate-700';
-        if (f.ranking === 'always_safe') badgeColor = 'bg-emerald-500/30 text-emerald-200 border-emerald-500/50';
+            if (appState.safeFoods.length > 0) {
+              container.innerHTML = appState.safeFoods.map(f => {
+                let badgeColor = 'bg-brand-500/20 text-brand-300 border-brand-500/30';
+                if (f.ranking === 'mostly_safe') badgeColor = 'bg-slate-800 text-slate-300 border-slate-700';
+                if (f.ranking === 'always_safe') badgeColor = 'bg-emerald-500/30 text-emerald-200 border-emerald-500/50';
 
-        return `
+                return `
           <span class="inline-flex items-center text-[11px] px-2.5 py-1 rounded-lg border ${badgeColor} space-x-1.5">
             <span>${f.name}</span>
             <button onclick="removeSafeFood(${f.id})" class="hover:text-rose-400 ml-1">&times;</button>
           </span>
         `;
-      }).join('');
-    } else {
-      container.innerHTML = `<p class="text-xs text-slate-500">No safe foods added yet.</p>`;
-    }
-  } catch (err) {
-    console.error('Error loading safe foods', err);
-  }
-}
+              }).join('');
+            } else {
+              container.innerHTML = `<p class="text-xs text-slate-500">No safe foods added yet.</p>`;
+            }
+          } catch (err) {
+            console.error('Error loading safe foods', err);
+          }
+        }
 
-function openAddSafeFoodModal() {
-  document.getElementById('addSafeFoodModal').classList.remove('hidden');
-}
+        function openAddSafeFoodModal() {
+          document.getElementById('addSafeFoodModal').classList.remove('hidden');
+        }
 
-async function executeAddSafeFood() {
-  const name = document.getElementById('safeFoodNameInput').value.trim();
-  const rank = document.getElementById('safeFoodRankInput').value;
-  if (!name) return;
+        async function executeAddSafeFood() {
+          const name = document.getElementById('safeFoodNameInput').value.trim();
+          const rank = document.getElementById('safeFoodRankInput').value;
+          if (!name) return;
 
-  try {
-    await fetch('/api/safe-foods', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, ranking: rank }),
-    });
-    closeModal('addSafeFoodModal');
-    document.getElementById('safeFoodNameInput').value = '';
-    await loadSafeFoods();
-  } catch (err) {
-    alert('Failed to save safe food');
-  }
-}
+          try {
+            await fetch('/api/safe-foods', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: name, ranking: rank }),
+            });
+            closeModal('addSafeFoodModal');
+            document.getElementById('safeFoodNameInput').value = '';
+            await loadSafeFoods();
+          } catch (err) {
+            alert('Failed to save safe food');
+          }
+        }
 
-async function removeSafeFood(id) {
-  try {
-    await fetch(`/api/safe-foods/${id}`, { method: 'DELETE' });
-    await loadSafeFoods();
-  } catch (err) {
-    alert('Failed to remove safe food');
-  }
-}
+        async function removeSafeFood(id) {
+          try {
+            await fetch(`/api/safe-foods/${id}`, { method: 'DELETE' });
+            await loadSafeFoods();
+          } catch (err) {
+            alert('Failed to remove safe food');
+          }
+        }
 
-// --- Profile / Settings Tab & Gemini API Key ---
+        // --- Profile / Settings Tab & Gemini API Key ---
 
-function openEditProfileModal() {
-  const p = appState.profile;
-  if (!p) return;
+        function openEditProfileModal() {
+          const p = appState.profile;
+          if (!p) return;
 
-  document.getElementById('epHeight').value = p.height_cm;
-  document.getElementById('epWeight').value = p.weight_kg;
-  document.getElementById('epAge').value = p.age;
-  document.getElementById('epSex').value = p.sex;
-  document.getElementById('epHrtStatus').checked = Boolean(p.hrt_status);
-  toggleEpHrtFields();
-  if (p.hrt_type) document.getElementById('epHrtType').value = p.hrt_type;
-  if (p.hrt_months) document.getElementById('epHrtMonths').value = p.hrt_months;
-  document.getElementById('epBodyFat').value = (p.body_fat_pct !== null && p.body_fat_pct !== undefined) ? p.body_fat_pct : '';
-  document.getElementById('epActivity').value = p.activity_level;
-  document.getElementById('epGoal').value = p.goal;
-  document.getElementById('epDisplayPref').value = p.display_preference || 'both';
-  document.getElementById('epSafeTracker').checked = Boolean(p.safe_food_tracker_enabled);
+          document.getElementById('epHeight').value = p.height_cm;
+          document.getElementById('epWeight').value = p.weight_kg;
+          document.getElementById('epAge').value = p.age;
+          document.getElementById('epSex').value = p.sex;
+          document.getElementById('epHrtStatus').checked = Boolean(p.hrt_status);
+          toggleEpHrtFields();
+          if (p.hrt_type) document.getElementById('epHrtType').value = p.hrt_type;
+          if (p.hrt_months) document.getElementById('epHrtMonths').value = p.hrt_months;
+          document.getElementById('epBodyFat').value = (p.body_fat_pct !== null && p.body_fat_pct !== undefined) ? p.body_fat_pct : '';
+          document.getElementById('epActivity').value = p.activity_level;
+          document.getElementById('epGoal').value = p.goal;
+          document.getElementById('epDisplayPref').value = p.display_preference || 'both';
+          document.getElementById('epSafeTracker').checked = Boolean(p.safe_food_tracker_enabled);
 
-  document.getElementById('editProfileModal').classList.remove('hidden');
-}
+          document.getElementById('editProfileModal').classList.remove('hidden');
+        }
 
-function toggleEpHrtFields() {
-  const isHrt = document.getElementById('epHrtStatus').checked;
-  const fields = document.getElementById('epHrtFields');
-  if (isHrt) fields.classList.remove('hidden');
-  else fields.classList.add('hidden');
-}
+        function toggleEpHrtFields() {
+          const isHrt = document.getElementById('epHrtStatus').checked;
+          const fields = document.getElementById('epHrtFields');
+          if (isHrt) fields.classList.remove('hidden');
+          else fields.classList.add('hidden');
+        }
 
-async function handleEditProfileSubmit(e) {
-  e.preventDefault();
-  const bfVal = document.getElementById('epBodyFat').value;
-  const payload = {
-    height_cm: parseFloat(document.getElementById('epHeight').value),
-    weight_kg: parseFloat(document.getElementById('epWeight').value),
-    age: parseInt(document.getElementById('epAge').value),
-    sex: document.getElementById('epSex').value,
-    hrt_status: document.getElementById('epHrtStatus').checked,
-    hrt_type: document.getElementById('epHrtType').value,
-    hrt_months: parseInt(document.getElementById('epHrtMonths').value) || 0,
-    body_fat_pct: bfVal ? parseFloat(bfVal) : null,
-    activity_level: document.getElementById('epActivity').value,
-    goal: document.getElementById('epGoal').value,
-    display_preference: document.getElementById('epDisplayPref').value,
-    safe_food_tracker_enabled: document.getElementById('epSafeTracker').checked,
-  };
+        async function handleEditProfileSubmit(e) {
+          e.preventDefault();
+          const bfVal = document.getElementById('epBodyFat').value;
+          const payload = {
+            height_cm: parseFloat(document.getElementById('epHeight').value),
+            weight_kg: parseFloat(document.getElementById('epWeight').value),
+            age: parseInt(document.getElementById('epAge').value),
+            sex: document.getElementById('epSex').value,
+            hrt_status: document.getElementById('epHrtStatus').checked,
+            hrt_type: document.getElementById('epHrtType').value,
+            hrt_months: parseInt(document.getElementById('epHrtMonths').value) || 0,
+            body_fat_pct: bfVal ? parseFloat(bfVal) : null,
+            activity_level: document.getElementById('epActivity').value,
+            goal: document.getElementById('epGoal').value,
+            display_preference: document.getElementById('epDisplayPref').value,
+            safe_food_tracker_enabled: document.getElementById('epSafeTracker').checked,
+          };
 
-  try {
-    const res = await fetch('/api/profile', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (data.success) {
-      appState.profile = data.profile;
-      closeModal('editProfileModal');
-      populateProfileTab();
-      await refreshDashboard();
-      alert('Profile and metabolic targets successfully saved to database!');
-    }
-  } catch (err) {
-    alert('Failed to update profile: ' + err);
-  }
-}
+          try {
+            const res = await fetch('/api/profile', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (data.success) {
+              appState.profile = data.profile;
+              closeModal('editProfileModal');
+              populateProfileTab();
+              await refreshDashboard();
+              alert('Profile and metabolic targets successfully saved to database!');
+            }
+          } catch (err) {
+            alert('Failed to update profile: ' + err);
+          }
+        }
 
-function populateProfileTab() {
-  const p = appState.profile;
-  if (!p) return;
+        function populateProfileTab() {
+          const p = appState.profile;
+          if (!p) return;
 
-  document.getElementById('profHeightWeight').textContent = `${p.height_cm} cm / ${p.weight_kg} kg`;
-  let hrtText = '';
-  if (p.hrt_status) {
-    hrtText = ` (HRT: ${p.hrt_type}, ${p.hrt_months}m)`;
-  }
-  document.getElementById('profAgeSex').textContent = `${p.age}y / ${p.sex}${hrtText}`;
-  document.getElementById('profBodyFat').textContent = p.body_fat_pct ? `${p.body_fat_pct}%` : 'Not specified';
-  document.getElementById('profBMR').textContent = `${p.bmr} kcal`;
-  document.getElementById('profTDEE').textContent = `${p.baseline_tdee} kcal (${p.activity_level})`;
-  document.getElementById('profGoalTarget').textContent = `${p.daily_target_calories} kcal (${p.goal})`;
-}
+          document.getElementById('profHeightWeight').textContent = `${p.height_cm} cm / ${p.weight_kg} kg`;
+          let hrtText = '';
+          if (p.hrt_status) {
+            hrtText = ` (HRT: ${p.hrt_type}, ${p.hrt_months}m)`;
+          }
+          document.getElementById('profAgeSex').textContent = `${p.age}y / ${p.sex}${hrtText}`;
+          document.getElementById('profBodyFat').textContent = p.body_fat_pct ? `${p.body_fat_pct}%` : 'Not specified';
+          document.getElementById('profBMR').textContent = `${p.bmr} kcal`;
+          document.getElementById('profTDEE').textContent = `${p.baseline_tdee} kcal (${p.activity_level})`;
+          document.getElementById('profGoalTarget').textContent = `${p.daily_target_calories} kcal (${p.goal})`;
+        }
 
-async function saveApiKey() {
-  const key = document.getElementById('geminiApiKeyInput').value.trim();
-  try {
-    const res = await fetch('/api/profile', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gemini_api_key: key }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      alert('Google Gemini API Key saved successfully!');
-    }
-  } catch (err) {
-    alert('Failed to save API key');
-  }
-}
+        async function saveApiKey() {
+          const key = document.getElementById('geminiApiKeyInput').value.trim();
+          try {
+            const res = await fetch('/api/profile', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ gemini_api_key: key }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('Google Gemini API Key saved successfully!');
+            }
+          } catch (err) {
+            alert('Failed to save API key');
+          }
+        }
 
-function dismissNotificationAlert() {
-  document.getElementById('rebalanceAlert').classList.add('hidden');
-}
+        function dismissNotificationAlert() {
+          document.getElementById('rebalanceAlert').classList.add('hidden');
+        }
 
-function openNotificationsModal() {
-  if (appState.dashboard && appState.dashboard.notifications.length > 0) {
-    const msg = appState.dashboard.notifications.map(n => n.message).join('\n\n');
-    alert('Adaptive Updates:\n\n' + msg);
-  } else {
-    alert('No unread notifications. Your metabolic baseline is actively tracking workout volume.');
-  }
-}
+        function openNotificationsModal() {
+          if (appState.dashboard && appState.dashboard.notifications.length > 0) {
+            const msg = appState.dashboard.notifications.map(n => n.message).join('\n\n');
+            alert('Adaptive Updates:\n\n' + msg);
+          } else {
+            alert('No unread notifications. Your metabolic baseline is actively tracking workout volume.');
+          }
+        }
 
-function closeModal(id) {
-  document.getElementById(id).classList.add('hidden');
-}
+        function closeModal(id) {
+          document.getElementById(id).classList.add('hidden');
+        }

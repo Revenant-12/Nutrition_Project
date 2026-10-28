@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -40,33 +41,48 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     /* Custom scrollbar and gym mobile styling */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    body { -webkit-tap-highlight-color: transparent; }
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
   </style>
 </head>
+
 <body class="bg-surface-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased pb-20 md:pb-6">
 
   <!-- Top App Bar -->
   <header class="sticky top-0 z-30 bg-surface-900/90 backdrop-blur border-b border-slate-800 px-4 py-3">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center font-black text-black text-lg">
+        <div
+          class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center font-black text-black text-lg">
           A
         </div>
         <div>
           <h1 class="font-bold text-base tracking-wide flex items-center gap-1.5">
             AuraFit
-            <span class="text-[10px] uppercase font-semibold bg-brand-500/10 text-brand-400 px-1.5 py-0.5 rounded border border-brand-500/20">Adaptive</span>
+            <span
+              class="text-[10px] uppercase font-semibold bg-brand-500/10 text-brand-400 px-1.5 py-0.5 rounded border border-brand-500/20">Adaptive</span>
           </h1>
           <p id="topDateDisplay" class="text-xs text-slate-400">Today</p>
         </div>
       </div>
       <div class="flex items-center space-x-2">
         <!-- Rebalance / Notification Bell -->
-        <button id="notificationBtn" onclick="openNotificationsModal()" class="relative p-2 rounded-lg bg-surface-800 hover:bg-slate-700 text-slate-300">
+        <button id="notificationBtn" onclick="openNotificationsModal()"
+          class="relative p-2 rounded-lg bg-surface-800 hover:bg-slate-700 text-slate-300">
           <i data-lucide="bell" class="w-4 h-4"></i>
-          <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-500 rounded-full animate-ping"></span>
+          <span id="notifBadge"
+            class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-500 rounded-full animate-ping"></span>
         </button>
         <button onclick="switchTab('profile')" class="p-2 rounded-lg bg-surface-800 hover:bg-slate-700 text-slate-300">
           <i data-lucide="settings" class="w-4 h-4"></i>
@@ -96,7 +112,7 @@
 
     <!-- TAB 1: DASHBOARD -->
     <section id="tab-dashboard" class="space-y-6">
-      
+
       <!-- Calorie Gauge Card -->
       <div class="bg-surface-900 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
         <div class="flex items-center justify-between mb-4">
@@ -128,7 +144,8 @@
 
         <!-- Progress bar -->
         <div class="w-full bg-surface-800 h-2.5 rounded-full overflow-hidden mt-3">
-          <div id="calProgressBar" class="bg-gradient-to-r from-brand-500 to-amber-400 h-full w-0 transition-all duration-500"></div>
+          <div id="calProgressBar"
+            class="bg-gradient-to-r from-brand-500 to-amber-400 h-full w-0 transition-all duration-500"></div>
         </div>
       </div>
 
@@ -138,7 +155,8 @@
           <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
             <i data-lucide="pie-chart" class="w-4 h-4 text-brand-400"></i> Macronutrients
           </h2>
-          <span id="dashMacroCategory" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
+          <span id="dashMacroCategory"
+            class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">
             Active / Fitness
           </span>
         </div>
@@ -150,7 +168,8 @@
               <span class="font-bold text-rose-400">Protein</span>
               <span id="dashProteinTarget" class="text-slate-400">0g</span>
             </div>
-            <p id="dashProteinEaten" class="text-lg font-extrabold text-white">0<span class="text-xs font-normal text-slate-400">g</span></p>
+            <p id="dashProteinEaten" class="text-lg font-extrabold text-white">0<span
+                class="text-xs font-normal text-slate-400">g</span></p>
             <div class="w-full bg-surface-800 h-1.5 rounded-full overflow-hidden mt-2">
               <div id="proteinProgressBar" class="bg-rose-500 h-full w-0 transition-all"></div>
             </div>
@@ -163,7 +182,8 @@
               <span class="font-bold text-sky-400">Carbs</span>
               <span id="dashCarbsTarget" class="text-slate-400">0g</span>
             </div>
-            <p id="dashCarbsEaten" class="text-lg font-extrabold text-white">0<span class="text-xs font-normal text-slate-400">g</span></p>
+            <p id="dashCarbsEaten" class="text-lg font-extrabold text-white">0<span
+                class="text-xs font-normal text-slate-400">g</span></p>
             <div class="w-full bg-surface-800 h-1.5 rounded-full overflow-hidden mt-2">
               <div id="carbsProgressBar" class="bg-sky-500 h-full w-0 transition-all"></div>
             </div>
@@ -176,7 +196,8 @@
               <span class="font-bold text-amber-400">Fat</span>
               <span id="dashFatTarget" class="text-slate-400">0g</span>
             </div>
-            <p id="dashFatEaten" class="text-lg font-extrabold text-white">0<span class="text-xs font-normal text-slate-400">g</span></p>
+            <p id="dashFatEaten" class="text-lg font-extrabold text-white">0<span
+                class="text-xs font-normal text-slate-400">g</span></p>
             <div class="w-full bg-surface-800 h-1.5 rounded-full overflow-hidden mt-2">
               <div id="fatProgressBar" class="bg-amber-500 h-full w-0 transition-all"></div>
             </div>
@@ -187,15 +208,18 @@
 
       <!-- Quick Action Buttons -->
       <div class="grid grid-cols-3 gap-3">
-        <button onclick="openLogMealModal()" class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-brand-500/50 rounded-xl transition">
+        <button onclick="openLogMealModal()"
+          class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-brand-500/50 rounded-xl transition">
           <i data-lucide="plus-circle" class="w-5 h-5 text-brand-400 mb-1"></i>
           <span class="text-xs font-semibold">Add Meal</span>
         </button>
-        <button onclick="startNewWorkout()" class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-amber-500/50 rounded-xl transition">
+        <button onclick="startNewWorkout()"
+          class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-amber-500/50 rounded-xl transition">
           <i data-lucide="dumbbell" class="w-5 h-5 text-amber-400 mb-1"></i>
           <span class="text-xs font-semibold">Workout</span>
         </button>
-        <button onclick="openRecommendRecipeModal()" class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-sky-500/50 rounded-xl transition">
+        <button onclick="openRecommendRecipeModal()"
+          class="flex flex-col items-center justify-center p-3.5 bg-gradient-to-b from-surface-850 to-surface-900 border border-slate-800 hover:border-sky-500/50 rounded-xl transition">
           <i data-lucide="utensils" class="w-5 h-5 text-sky-400 mb-1"></i>
           <span class="text-xs font-semibold">Recipe Finder</span>
         </button>
@@ -235,9 +259,10 @@
 
     <!-- TAB 2: WORKOUTS -->
     <section id="tab-workouts" class="hidden space-y-6">
-      
+
       <!-- Active Workout Tracker Card -->
-      <div id="activeWorkoutCard" class="hidden bg-surface-900 border-2 border-amber-500/40 rounded-2xl p-5 shadow-2xl space-y-4">
+      <div id="activeWorkoutCard"
+        class="hidden bg-surface-900 border-2 border-amber-500/40 rounded-2xl p-5 shadow-2xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-800 pb-3">
           <div>
             <h3 class="font-bold text-base text-white flex items-center gap-2">
@@ -247,10 +272,13 @@
             <p id="workoutTimer" class="text-xs text-amber-400 font-mono mt-0.5">Duration: 00:00</p>
           </div>
           <div class="flex items-center space-x-2">
-            <button onclick="toggleWeightUnit()" id="weightUnitToggleBtn" class="bg-surface-800 hover:bg-slate-700 text-xs text-amber-400 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold uppercase" title="Switch between LBS and KG">
+            <button onclick="toggleWeightUnit()" id="weightUnitToggleBtn"
+              class="bg-surface-800 hover:bg-slate-700 text-xs text-amber-400 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold uppercase"
+              title="Switch between LBS and KG">
               Unit: LBS
             </button>
-            <button onclick="openMachineIdentifierModal()" class="bg-surface-800 hover:bg-slate-700 text-xs text-brand-300 px-3 py-1.5 rounded-lg border border-brand-500/30 flex items-center gap-1.5">
+            <button onclick="openMachineIdentifierModal()"
+              class="bg-surface-800 hover:bg-slate-700 text-xs text-brand-300 px-3 py-1.5 rounded-lg border border-brand-500/30 flex items-center gap-1.5">
               <i data-lucide="camera" class="w-3.5 h-3.5 text-brand-400"></i> Identify Machine
             </button>
           </div>
@@ -262,13 +290,16 @@
         </div>
 
         <div class="pt-2 flex flex-col sm:flex-row gap-2">
-          <button onclick="openAddExerciseModal()" class="w-full py-2.5 bg-surface-800 hover:bg-surface-850 border border-slate-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 text-slate-200">
+          <button onclick="openAddExerciseModal()"
+            class="w-full py-2.5 bg-surface-800 hover:bg-surface-850 border border-slate-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 text-slate-200">
             <i data-lucide="plus" class="w-4 h-4 text-brand-400"></i> Add Exercise
           </button>
-          <button onclick="finishActiveWorkout()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20">
+          <button onclick="finishActiveWorkout()"
+            class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20">
             <i data-lucide="check-circle" class="w-4 h-4"></i> End Workout & Calculate Total
           </button>
-          <button onclick="cancelActiveWorkout()" class="py-2.5 px-4 bg-surface-850 hover:bg-rose-950/40 text-rose-400 border border-rose-900/40 text-xs font-semibold rounded-xl flex items-center justify-center gap-1">
+          <button onclick="cancelActiveWorkout()"
+            class="py-2.5 px-4 bg-surface-850 hover:bg-rose-950/40 text-rose-400 border border-rose-900/40 text-xs font-semibold rounded-xl flex items-center justify-center gap-1">
             <i data-lucide="x" class="w-3.5 h-3.5"></i> Discard
           </button>
         </div>
@@ -281,9 +312,11 @@
         </div>
         <h3 class="font-bold text-lg text-white">Ready for a Workout?</h3>
         <p class="text-xs text-slate-400 max-w-sm mx-auto">
-          Log strength & cardio exercises, snap machine photos for automatic detection, and calculate your total volume comparison.
+          Log strength & cardio exercises, snap machine photos for automatic detection, and calculate your total volume
+          comparison.
         </p>
-        <button onclick="startNewWorkout()" class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-brand-500/20">
+        <button onclick="startNewWorkout()"
+          class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-brand-500/20">
           Start Workout Session
         </button>
       </div>
@@ -306,14 +339,16 @@
           <h2 class="text-base font-bold text-white">Daily Meal Tracker</h2>
           <p class="text-xs text-slate-400">Search foods, scan labels, or scale saved recipes.</p>
         </div>
-        <button onclick="openLogMealModal()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-500/20">
+        <button onclick="openLogMealModal()"
+          class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-500/20">
           <i data-lucide="plus" class="w-4 h-4"></i> Add Food
         </button>
       </div>
 
       <!-- Meal Search & Scanning Quick Hub -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <button onclick="openLogMealModal('search')" class="p-4 bg-surface-900 border border-slate-800 hover:border-brand-500/40 rounded-xl text-left flex items-start space-x-3">
+        <button onclick="openLogMealModal('search')"
+          class="p-4 bg-surface-900 border border-slate-800 hover:border-brand-500/40 rounded-xl text-left flex items-start space-x-3">
           <div class="p-2.5 bg-brand-500/10 text-brand-400 rounded-lg">
             <i data-lucide="search" class="w-5 h-5"></i>
           </div>
@@ -323,7 +358,8 @@
           </div>
         </button>
 
-        <button onclick="openLabelScannerModal()" class="p-4 bg-surface-900 border border-slate-800 hover:border-sky-500/40 rounded-xl text-left flex items-start space-x-3">
+        <button onclick="openLabelScannerModal()"
+          class="p-4 bg-surface-900 border border-slate-800 hover:border-sky-500/40 rounded-xl text-left flex items-start space-x-3">
           <div class="p-2.5 bg-sky-500/10 text-sky-400 rounded-lg">
             <i data-lucide="camera" class="w-5 h-5"></i>
           </div>
@@ -333,7 +369,8 @@
           </div>
         </button>
 
-        <button onclick="openPortionRecipeModal()" class="p-4 bg-surface-900 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex items-start space-x-3">
+        <button onclick="openPortionRecipeModal()"
+          class="p-4 bg-surface-900 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex items-start space-x-3">
           <div class="p-2.5 bg-amber-500/10 text-amber-400 rounded-lg">
             <i data-lucide="pie-chart" class="w-5 h-5"></i>
           </div>
@@ -364,10 +401,12 @@
           <p class="text-xs text-slate-400">Batch-scale raw ingredients & get tailored recommendations.</p>
         </div>
         <div class="flex space-x-2">
-          <button onclick="openRecommendRecipeModal()" class="px-3 py-1.5 bg-surface-800 hover:bg-slate-700 text-xs font-semibold rounded-xl text-sky-300 border border-sky-500/30 flex items-center gap-1">
+          <button onclick="openRecommendRecipeModal()"
+            class="px-3 py-1.5 bg-surface-800 hover:bg-slate-700 text-xs font-semibold rounded-xl text-sky-300 border border-sky-500/30 flex items-center gap-1">
             <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sky-400"></i> Recommend
           </button>
-          <button onclick="openCreateRecipeModal()" class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-xl flex items-center gap-1 shadow-md shadow-brand-500/20">
+          <button onclick="openCreateRecipeModal()"
+            class="px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-xl flex items-center gap-1 shadow-md shadow-brand-500/20">
             <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Recipe
           </button>
         </div>
@@ -405,7 +444,8 @@
             <h2 class="text-base font-bold text-white">Profile & Metabolic Settings</h2>
             <p class="text-xs text-slate-400">Modify your stats, HRT duration, body fat, or targets anytime.</p>
           </div>
-          <button onclick="openEditProfileModal()" class="px-3 py-1.5 bg-surface-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-200 border border-slate-700">
+          <button onclick="openEditProfileModal()"
+            class="px-3 py-1.5 bg-surface-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-200 border border-slate-700">
             Edit Profile
           </button>
         </div>
@@ -446,7 +486,8 @@
             <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
               <i data-lucide="key" class="w-3.5 h-3.5 text-brand-400"></i> Google Gemini Vision API Key
             </label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-brand-400 hover:underline">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank"
+              class="text-[11px] text-brand-400 hover:underline">
               Get Free Key &rarr;
             </a>
           </div>
@@ -454,8 +495,10 @@
             Required for gym machine camera recognition and instant nutrition label scanning.
           </p>
           <div class="flex space-x-2">
-            <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="flex-1 bg-surface-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
-            <button onclick="saveApiKey()" class="px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-lg">
+            <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..."
+              class="flex-1 bg-surface-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
+            <button onclick="saveApiKey()"
+              class="px-4 py-1.5 bg-brand-500 hover:bg-brand-600 text-black text-xs font-bold rounded-lg">
               Save Key
             </button>
           </div>
@@ -475,23 +518,28 @@
   <!-- Bottom Mobile Navigation Bar -->
   <nav class="fixed bottom-0 left-0 right-0 z-30 bg-surface-900/95 backdrop-blur border-t border-slate-800 px-2 py-2">
     <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center py-1 text-brand-400 transition">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard"
+        class="flex flex-col items-center py-1 text-brand-400 transition">
         <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-1">Dashboard</span>
       </button>
-      <button onclick="switchTab('workouts')" id="nav-workouts" class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
+      <button onclick="switchTab('workouts')" id="nav-workouts"
+        class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
         <i data-lucide="dumbbell" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-1">Workouts</span>
       </button>
-      <button onclick="switchTab('meals')" id="nav-meals" class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
+      <button onclick="switchTab('meals')" id="nav-meals"
+        class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
         <i data-lucide="utensils" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-1">Meals</span>
       </button>
-      <button onclick="switchTab('recipes')" id="nav-recipes" class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
+      <button onclick="switchTab('recipes')" id="nav-recipes"
+        class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
         <i data-lucide="book-open" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-1">Recipes</span>
       </button>
-      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
+      <button onclick="switchTab('profile')" id="nav-profile"
+        class="flex flex-col items-center py-1 text-slate-400 hover:text-white transition">
         <i data-lucide="user" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-1">Profile</span>
       </button>
@@ -501,7 +549,8 @@
   <!-- MODALS CONTAINER -->
 
   <!-- 1. ONBOARDING MODAL (Section 1.1) -->
-  <div id="onboardingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="onboardingModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4 my-8">
       <div class="text-center space-y-1">
         <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-2">
@@ -512,20 +561,23 @@
       </div>
 
       <form id="onboardingForm" onsubmit="handleOnboardingSubmit(event)" class="space-y-4 text-xs">
-        
+
         <!-- Height / Weight / Age -->
         <div class="grid grid-cols-3 gap-2.5">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Height (cm)</label>
-            <input type="number" step="0.1" id="obHeight" required placeholder="175" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="obHeight" required placeholder="175"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Weight (kg)</label>
-            <input type="number" step="0.1" id="obWeight" required placeholder="70" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="obWeight" required placeholder="70"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Age</label>
-            <input type="number" id="obAge" required placeholder="25" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" id="obAge" required placeholder="25"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
         </div>
 
@@ -538,7 +590,8 @@
               <option value="female">Female</option>
             </select>
             <div class="flex items-center space-x-2 px-2">
-              <input type="checkbox" id="obHrtStatus" onchange="toggleHrtFields()" class="rounded bg-surface-900 border-slate-700 text-brand-500 focus:ring-0" />
+              <input type="checkbox" id="obHrtStatus" onchange="toggleHrtFields()"
+                class="rounded bg-surface-900 border-slate-700 text-brand-500 focus:ring-0" />
               <label for="obHrtStatus" class="text-slate-300">Currently on HRT</label>
             </div>
           </div>
@@ -553,7 +606,8 @@
             </div>
             <div>
               <label class="block text-[11px] text-slate-400 mb-0.5">Months on HRT</label>
-              <input type="number" id="obHrtMonths" placeholder="14" class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
+              <input type="number" id="obHrtMonths" placeholder="14"
+                class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
             </div>
           </div>
         </div>
@@ -563,7 +617,8 @@
           <label class="block text-slate-300 font-semibold mb-1">
             Body Fat % <span class="text-slate-500 font-normal">(Optional — enables Katch-McArdle)</span>
           </label>
-          <input type="number" step="0.1" id="obBodyFat" placeholder="e.g. 18.5" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="number" step="0.1" id="obBodyFat" placeholder="e.g. 18.5"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
         </div>
 
         <!-- Activity Level (Section 1.1.3) -->
@@ -603,7 +658,8 @@
         <!-- Safe Food Tracker Option (Section 1.1.7) -->
         <div class="bg-surface-850 p-3 rounded-xl border border-slate-800 space-y-2">
           <div class="flex items-center space-x-2">
-            <input type="checkbox" id="obSafeTracker" onchange="toggleObSafeFoods()" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+            <input type="checkbox" id="obSafeTracker" onchange="toggleObSafeFoods()"
+              class="rounded bg-surface-900 border-slate-700 text-brand-500" />
             <label for="obSafeTracker" class="text-slate-300 font-semibold">Enable Safe Food Tracker</label>
           </div>
           <p class="text-[11px] text-slate-400">
@@ -611,11 +667,13 @@
           </p>
           <div id="obSafeFoodsInputArea" class="hidden space-y-1 pt-1">
             <label class="block text-[11px] text-slate-400">Add Initial Safe Foods (comma separated):</label>
-            <input type="text" id="obSafeFoodsList" placeholder="Chicken, Rice, Oats, Apples" class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
+            <input type="text" id="obSafeFoodsList" placeholder="Chicken, Rice, Oats, Apples"
+              class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-brand-500/20">
+        <button type="submit"
+          class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-brand-500/20">
           Complete Setup & Enter App
         </button>
       </form>
@@ -623,7 +681,8 @@
   </div>
 
   <!-- 2. LOG MEAL MODAL -->
-  <div id="logMealModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="logMealModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -638,42 +697,50 @@
       <div class="space-y-2 text-xs">
         <label class="block text-slate-300 font-semibold">Search Food / Ingredient</label>
         <div class="flex space-x-2">
-          <input type="text" id="foodSearchInput" placeholder="Chicken breast, rice, oatmeal..." class="flex-1 bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="text" id="foodSearchInput" placeholder="Chicken breast, rice, oatmeal..."
+            class="flex-1 bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           <button onclick="handleFoodSearch()" class="px-3 bg-brand-500 text-black font-bold rounded-lg">Search</button>
         </div>
         <div id="foodSearchResults" class="max-h-36 overflow-y-auto space-y-1 pt-1"></div>
       </div>
 
       <!-- Manual or Selected Food Form -->
-      <form id="logMealForm" onsubmit="handleLogMealSubmit(event)" class="space-y-3 text-xs border-t border-slate-800 pt-3">
+      <form id="logMealForm" onsubmit="handleLogMealSubmit(event)"
+        class="space-y-3 text-xs border-t border-slate-800 pt-3">
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Food / Meal Name</label>
-          <input type="text" id="mealNameInput" required placeholder="Grilled Chicken Salad" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="text" id="mealNameInput" required placeholder="Grilled Chicken Salad"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Calories (kcal)</label>
-            <input type="number" step="0.1" id="mealCalInput" required placeholder="350" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="mealCalInput" required placeholder="350"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Protein (g)</label>
-            <input type="number" step="0.1" id="mealProteinInput" required placeholder="35" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="mealProteinInput" required placeholder="35"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Carbs (g)</label>
-            <input type="number" step="0.1" id="mealCarbsInput" required placeholder="20" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="mealCarbsInput" required placeholder="20"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Fat (g)</label>
-            <input type="number" step="0.1" id="mealFatInput" required placeholder="10" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="mealFatInput" required placeholder="10"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
         </div>
 
-        <button type="submit" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
+        <button type="submit"
+          class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
           Save Meal Entry
         </button>
       </form>
@@ -681,7 +748,8 @@
   </div>
 
   <!-- 3. SCAN NUTRITION LABEL MODAL (Gemini Vision) -->
-  <div id="labelScannerModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="labelScannerModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -697,9 +765,11 @@
         <p class="text-[11px] text-sky-300">Powered by Google Gemini Vision AI.</p>
       </div>
 
-      <input type="file" id="labelImageFileInput" accept="image/*" capture="environment" class="w-full text-xs text-slate-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-black hover:file:bg-sky-600" />
+      <input type="file" id="labelImageFileInput" accept="image/*" capture="environment"
+        class="w-full text-xs text-slate-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-black hover:file:bg-sky-600" />
 
-      <button id="scanLabelBtn" onclick="executeScanNutritionLabel()" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-black font-bold text-xs rounded-xl flex items-center justify-center gap-2">
+      <button id="scanLabelBtn" onclick="executeScanNutritionLabel()"
+        class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-black font-bold text-xs rounded-xl flex items-center justify-center gap-2">
         <i data-lucide="sparkles" class="w-4 h-4"></i> Analyze Label Photo
       </button>
 
@@ -708,7 +778,8 @@
   </div>
 
   <!-- 4. MACHINE IDENTIFIER MODAL (Gemini Vision) -->
-  <div id="machineIdentifierModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="machineIdentifierModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -723,20 +794,26 @@
         Don't know the machine name? Take a picture of the machine or equipment at the gym.
       </p>
 
-      <input type="file" id="machineImageFileInput" accept="image/*" capture="environment" class="w-full text-xs text-slate-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-600" />
+      <input type="file" id="machineImageFileInput" accept="image/*" capture="environment"
+        class="w-full text-xs text-slate-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-black hover:file:bg-brand-600" />
 
-      <button id="identifyMachineBtn" onclick="executeIdentifyMachine()" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs rounded-xl flex items-center justify-center gap-2">
+      <button id="identifyMachineBtn" onclick="executeIdentifyMachine()"
+        class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs rounded-xl flex items-center justify-center gap-2">
         <i data-lucide="sparkles" class="w-4 h-4"></i> Identify Machine & Target Muscles
       </button>
 
-      <div id="machineIdentifyResult" class="hidden bg-surface-850 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs"></div>
+      <div id="machineIdentifyResult"
+        class="hidden bg-surface-850 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs"></div>
     </div>
   </div>
 
   <!-- 5. WORKOUT FINISHED COMPARISON MODAL (Section 3.5.2) -->
-  <div id="workoutFinishedModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
-    <div class="bg-surface-900 border-2 border-amber-500/60 max-w-md w-full rounded-2xl p-6 text-center shadow-2xl space-y-4">
-      <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+  <div id="workoutFinishedModal"
+    class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+    <div
+      class="bg-surface-900 border-2 border-amber-500/60 max-w-md w-full rounded-2xl p-6 text-center shadow-2xl space-y-4">
+      <div
+        class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-2xl">
         🏆
       </div>
       <h3 class="text-lg font-black text-white">Workout Complete!</h3>
@@ -746,14 +823,16 @@
         <p id="wfCaloriesText" class="text-xs text-slate-400 mt-1"></p>
       </div>
 
-      <button onclick="closeModal('workoutFinishedModal'); switchTab('dashboard');" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs rounded-xl uppercase tracking-wider">
+      <button onclick="closeModal('workoutFinishedModal'); switchTab('dashboard');"
+        class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold text-xs rounded-xl uppercase tracking-wider">
         Back to Dashboard
       </button>
     </div>
   </div>
 
   <!-- 6. CREATE RECIPE MODAL (Section 4.1) -->
-  <div id="createRecipeModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="createRecipeModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-lg w-full rounded-2xl p-5 shadow-2xl space-y-4 my-8">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -768,11 +847,13 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Recipe Name</label>
-            <input type="text" id="recipeNameInput" required placeholder="High-Protein Chili" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="text" id="recipeNameInput" required placeholder="High-Protein Chili"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Meal Category</label>
-            <select id="recipeCategoryInput" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
+            <select id="recipeCategoryInput"
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
               <option value="meal">Meal</option>
               <option value="breakfast">Breakfast</option>
               <option value="snack">Snack</option>
@@ -785,7 +866,8 @@
         <div class="space-y-2">
           <div class="flex justify-between items-center">
             <span class="font-semibold text-slate-300">Raw Ingredients</span>
-            <button type="button" onclick="addRecipeIngredientRow()" class="text-brand-400 text-[11px] hover:underline">+ Add Ingredient</button>
+            <button type="button" onclick="addRecipeIngredientRow()"
+              class="text-brand-400 text-[11px] hover:underline">+ Add Ingredient</button>
           </div>
           <div id="recipeIngredientsRows" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
         </div>
@@ -802,11 +884,13 @@
         </div>
 
         <div class="flex items-center space-x-2 pt-1">
-          <input type="checkbox" id="recipeAddToSafeFoods" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+          <input type="checkbox" id="recipeAddToSafeFoods"
+            class="rounded bg-surface-900 border-slate-700 text-brand-500" />
           <label for="recipeAddToSafeFoods" class="text-slate-300">Add these ingredients to Safe Food Tracker</label>
         </div>
 
-        <button type="submit" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
+        <button type="submit"
+          class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
           Save Recipe to Cookbook
         </button>
       </form>
@@ -814,7 +898,8 @@
   </div>
 
   <!-- 7. RECOMMEND RECIPE MODAL (Section 4.2) -->
-  <div id="recommendRecipeModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="recommendRecipeModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-lg w-full rounded-2xl p-5 shadow-2xl space-y-4 my-8">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -850,18 +935,22 @@
         <div class="bg-surface-850 p-3 rounded-xl border border-slate-800 space-y-2">
           <div class="flex items-center justify-between">
             <span class="font-semibold text-brand-400">Safe Food Filtering</span>
-            <select id="recFilterMode" class="bg-surface-900 border border-slate-700 text-white rounded p-1 text-[11px]">
+            <select id="recFilterMode"
+              class="bg-surface-900 border border-slate-700 text-white rounded p-1 text-[11px]">
               <option value="soft">Soft Filter (Rank safe first)</option>
               <option value="hard">Hard Filter (Exclude unsafe)</option>
             </select>
           </div>
           <div class="flex items-center space-x-2">
-            <input type="checkbox" id="recFamiliarOnly" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
-            <label for="recFamiliarOnly" class="text-slate-300">Prefer familiar recipes (regularly used ingredients)</label>
+            <input type="checkbox" id="recFamiliarOnly"
+              class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+            <label for="recFamiliarOnly" class="text-slate-300">Prefer familiar recipes (regularly used
+              ingredients)</label>
           </div>
         </div>
 
-        <button onclick="executeRecipeRecommendation()" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-black font-bold rounded-xl shadow-md">
+        <button onclick="executeRecipeRecommendation()"
+          class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-black font-bold rounded-xl shadow-md">
           Find Best Matches
         </button>
 
@@ -871,7 +960,8 @@
   </div>
 
   <!-- 8. PORTION RECIPE MODAL (Section 4.1.4) -->
-  <div id="portionRecipeModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="portionRecipeModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white">Log Portion of Saved Recipe</h3>
@@ -883,19 +973,23 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Select Recipe</label>
-          <select id="portionRecipeSelect" onchange="updatePortionPreview()" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white"></select>
+          <select id="portionRecipeSelect" onchange="updatePortionPreview()"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white"></select>
         </div>
 
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Portion Weight Consumed (grams)</label>
-          <input type="number" step="1" id="portionWeightGrams" oninput="updatePortionPreview()" placeholder="250" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="number" step="1" id="portionWeightGrams" oninput="updatePortionPreview()" placeholder="250"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
         </div>
 
-        <div id="portionCalculationPreview" class="bg-surface-850 p-3 rounded-xl border border-slate-800 text-slate-300 space-y-1">
+        <div id="portionCalculationPreview"
+          class="bg-surface-850 p-3 rounded-xl border border-slate-800 text-slate-300 space-y-1">
           <p class="text-slate-400">Enter portion weight to calculate scaled macros.</p>
         </div>
 
-        <button onclick="executeLogRecipePortion()" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
+        <button onclick="executeLogRecipePortion()"
+          class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl shadow-md">
           Log Portioned Meal
         </button>
       </div>
@@ -903,7 +997,8 @@
   </div>
 
   <!-- 9. ADD SAFE FOOD MODAL -->
-  <div id="addSafeFoodModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="addSafeFoodModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white">Add Safe Food</h3>
@@ -914,17 +1009,20 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Food / Ingredient Name</label>
-          <input type="text" id="safeFoodNameInput" placeholder="Oatmeal" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="text" id="safeFoodNameInput" placeholder="Oatmeal"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
         </div>
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Safety Ranking</label>
-          <select id="safeFoodRankInput" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
+          <select id="safeFoodRankInput"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
             <option value="always_safe">Always Safe (Tier 1)</option>
             <option value="safe" selected>Safe (Tier 2)</option>
             <option value="mostly_safe">Mostly Safe (Tier 3)</option>
           </select>
         </div>
-        <button onclick="executeAddSafeFood()" class="w-full py-2 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl">
+        <button onclick="executeAddSafeFood()"
+          class="w-full py-2 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl">
           Save Safe Food
         </button>
       </div>
@@ -932,7 +1030,8 @@
   </div>
 
   <!-- 10. ADD EXERCISE MODAL (for Workout Tracker) -->
-  <div id="addExerciseModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="addExerciseModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-md w-full rounded-2xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white">Add Exercise</h3>
@@ -945,13 +1044,20 @@
       <div class="space-y-1.5 text-xs">
         <label class="block text-slate-400">Filter by Target Muscle:</label>
         <div class="flex flex-wrap gap-1" id="muscleFilterBtns">
-          <button onclick="filterExercisesByMuscle('')" class="px-2 py-1 bg-brand-500 text-black font-bold rounded text-[11px]">All</button>
-          <button onclick="filterExercisesByMuscle('Chest')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Chest</button>
-          <button onclick="filterExercisesByMuscle('Back')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Back</button>
-          <button onclick="filterExercisesByMuscle('Quads')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Legs</button>
-          <button onclick="filterExercisesByMuscle('Shoulders')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Shoulders</button>
-          <button onclick="filterExercisesByMuscle('Biceps')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Arms</button>
-          <button onclick="filterExercisesByMuscle('Cardio')" class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Cardio</button>
+          <button onclick="filterExercisesByMuscle('')"
+            class="px-2 py-1 bg-brand-500 text-black font-bold rounded text-[11px]">All</button>
+          <button onclick="filterExercisesByMuscle('Chest')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Chest</button>
+          <button onclick="filterExercisesByMuscle('Back')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Back</button>
+          <button onclick="filterExercisesByMuscle('Quads')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Legs</button>
+          <button onclick="filterExercisesByMuscle('Shoulders')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Shoulders</button>
+          <button onclick="filterExercisesByMuscle('Biceps')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Arms</button>
+          <button onclick="filterExercisesByMuscle('Cardio')"
+            class="px-2 py-1 bg-surface-800 text-slate-300 rounded text-[11px]">Cardio</button>
         </div>
       </div>
 
@@ -961,15 +1067,18 @@
       <div class="border-t border-slate-800 pt-3 space-y-2 text-xs">
         <label class="block text-slate-400">Or type custom exercise name:</label>
         <div class="flex space-x-2">
-          <input type="text" id="customExerciseInput" placeholder="Exercise name..." class="flex-1 bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
-          <button onclick="addCustomExerciseToActiveWorkout()" class="px-3 bg-brand-500 text-black font-bold rounded-lg">Add</button>
+          <input type="text" id="customExerciseInput" placeholder="Exercise name..."
+            class="flex-1 bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <button onclick="addCustomExerciseToActiveWorkout()"
+            class="px-3 bg-brand-500 text-black font-bold rounded-lg">Add</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 11. EDIT PROFILE MODAL (Section 2.6) -->
-  <div id="editProfileModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+  <div id="editProfileModal"
+    class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
     <div class="bg-surface-900 border border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4 my-8">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -985,15 +1094,18 @@
         <div class="grid grid-cols-3 gap-2.5">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Height (cm)</label>
-            <input type="number" step="0.1" id="epHeight" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="epHeight" required
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Weight (kg)</label>
-            <input type="number" step="0.1" id="epWeight" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" step="0.1" id="epWeight" required
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Age</label>
-            <input type="number" id="epAge" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+            <input type="number" id="epAge" required
+              class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
           </div>
         </div>
 
@@ -1006,7 +1118,8 @@
               <option value="female">Female</option>
             </select>
             <div class="flex items-center space-x-2 px-2">
-              <input type="checkbox" id="epHrtStatus" onchange="toggleEpHrtFields()" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+              <input type="checkbox" id="epHrtStatus" onchange="toggleEpHrtFields()"
+                class="rounded bg-surface-900 border-slate-700 text-brand-500" />
               <label for="epHrtStatus" class="text-slate-300">On HRT</label>
             </div>
           </div>
@@ -1021,7 +1134,8 @@
             </div>
             <div>
               <label class="block text-[11px] text-slate-400 mb-0.5">Months on HRT</label>
-              <input type="number" id="epHrtMonths" class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
+              <input type="number" id="epHrtMonths"
+                class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
             </div>
           </div>
         </div>
@@ -1029,7 +1143,8 @@
         <!-- Body Fat % -->
         <div>
           <label class="block text-slate-300 font-semibold mb-1">Body Fat % (Optional)</label>
-          <input type="number" step="0.1" id="epBodyFat" placeholder="Leave empty if unknown" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          <input type="number" step="0.1" id="epBodyFat" placeholder="Leave empty if unknown"
+            class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
         </div>
 
         <!-- Activity Level & Goal -->
@@ -1072,15 +1187,43 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl uppercase tracking-wider shadow-md">
+        <button type="submit"
+          class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl uppercase tracking-wider shadow-md">
           Save Changes
         </button>
       </form>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APP LOGIC -->
-  <script src="/static/app.js"></script>
-</body>
-</html>
+  <!-- 12. CONFIRM DELETE MODAL (Universal in-app confirmation) -->
+  <div id="confirmDeleteModal"
+    class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+    <div
+      class="bg-surface-900 border-2 border-rose-500/50 max-w-sm w-full rounded-2xl p-5 shadow-2xl space-y-4 text-center">
+      <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl">
+        🗑️
+      </div>
+      <div>
+        <h3 id="confirmDeleteTitle" class="text-base font-bold text-white">Delete Item?</h3>
+        <p id="confirmDeleteMessage" class="text-xs text-slate-400 mt-1">
+          Are you sure you want to remove this? This action cannot be undone.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="closeModal('confirmDeleteModal')"
+          class="w-full py-2 bg-surface-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700">
+          Cancel
+        </button>
+        <button id="confirmDeleteActionBtn"
+          class="w-full py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-rose-500/25">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
 
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script src="/static/app.js?v=2.2.0"></script>
+</body>
+
+</html>
