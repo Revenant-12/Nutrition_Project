@@ -13,16 +13,18 @@ let appState = {
   // Active workout state
   activeWorkout: null,
   workoutTimerInterval: null,
-  weightUnit: 'lbs', // 'lbs' or 'kg'
+  weightUnit: localStorage.getItem('aurafit_weight_unit') || 'lbs', // 'lbs' or 'kg'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.lucide) lucide.createIcons();
   registerServiceWorker();
+  updateWeightUnitUI();
   await loadProfile();
   await refreshDashboard();
   await loadSafeFoods();
   await loadCookbook();
+  restoreActiveWorkoutFromStorage();
 });
 
 function registerServiceWorker() {
@@ -292,6 +294,63 @@ function restartOnboarding() {
   document.getElementById('onboardingModal').classList.remove('hidden');
 }
 
+// --- Active Workout Persistence & Units ---
+
+function updateWeightUnitUI() {
+  const btn = document.getElementById('weightUnitToggleBtn');
+  if (btn) btn.textContent = `Unit: ${appState.weightUnit.toUpperCase()}`;
+}
+
+function toggleWeightUnit() {
+  appState.weightUnit = appState.weightUnit === 'lbs' ? 'kg' : 'lbs';
+  localStorage.setItem('aurafit_weight_unit', appState.weightUnit);
+  updateWeightUnitUI();
+  if (appState.activeWorkout) {
+    renderActiveExercises();
+  }
+}
+
+function saveActiveWorkoutToStorage() {
+  if (appState.activeWorkout) {
+    localStorage.setItem('aurafit_active_workout', JSON.stringify(appState.activeWorkout));
+  } else {
+    localStorage.removeItem('aurafit_active_workout');
+  }
+}
+
+function restoreActiveWorkoutFromStorage() {
+  try {
+    const saved = localStorage.getItem('aurafit_active_workout');
+    if (!saved) return;
+    const parsed = JSON.parse(saved);
+    if (parsed && parsed.startTime) {
+      appState.activeWorkout = {
+        ...parsed,
+        startTime: new Date(parsed.startTime),
+      };
+      document.getElementById('startWorkoutPrompt').classList.add('hidden');
+      document.getElementById('activeWorkoutCard').classList.remove('hidden');
+      if (appState.workoutTimerInterval) clearInterval(appState.workoutTimerInterval);
+      appState.workoutTimerInterval = setInterval(updateWorkoutTimer, 1000);
+      renderActiveExercises();
+      updateWorkoutTimer();
+      if (window.lucide) lucide.createIcons();
+    }
+  } catch (err) {
+    console.error('Failed to restore active workout session', err);
+    localStorage.removeItem('aurafit_active_workout');
+  }
+}
+
+function cancelActiveWorkout() {
+  if (!confirm('Discard this in-progress workout session?')) return;
+  if (appState.workoutTimerInterval) clearInterval(appState.workoutTimerInterval);
+  appState.activeWorkout = null;
+  localStorage.removeItem('aurafit_active_workout');
+  document.getElementById('activeWorkoutCard').classList.add('hidden');
+  document.getElementById('startWorkoutPrompt').classList.remove('hidden');
+}
+
 // --- Active Workout Session ---
 
 function startNewWorkout() {
@@ -302,6 +361,7 @@ function startNewWorkout() {
     musclesWorked: [],
   };
 
+  saveActiveWorkoutToStorage();
   document.getElementById('startWorkoutPrompt').classList.add('hidden');
   document.getElementById('activeWorkoutCard').classList.remove('hidden');
 
@@ -396,6 +456,7 @@ async function addExerciseToActiveWorkout(name, category, muscles) {
     });
   }
 
+  saveActiveWorkoutToStorage();
   renderActiveExercises();
 }
 
@@ -460,6 +521,7 @@ function addSet(exIdx) {
     distance_miles: 0,
     duration_minutes: 0,
   });
+  saveActiveWorkoutToStorage();
   renderActiveExercises();
 }
 
@@ -467,16 +529,19 @@ function removeSet(exIdx, sIdx) {
   const ex = appState.activeWorkout.exercises[exIdx];
   ex.sets.splice(sIdx, 1);
   ex.sets.forEach((s, idx) => s.set_number = idx + 1);
+  saveActiveWorkoutToStorage();
   renderActiveExercises();
 }
 
 function removeExercise(exIdx) {
   appState.activeWorkout.exercises.splice(exIdx, 1);
+  saveActiveWorkoutToStorage();
   renderActiveExercises();
 }
 
 function updateSetVal(exIdx, sIdx, field, val) {
   appState.activeWorkout.exercises[exIdx].sets[sIdx][field] = parseFloat(val) || 0;
+  saveActiveWorkoutToStorage();
 }
 
 async function finishActiveWorkout() {
@@ -505,6 +570,7 @@ async function finishActiveWorkout() {
       document.getElementById('activeWorkoutCard').classList.add('hidden');
       document.getElementById('startWorkoutPrompt').classList.remove('hidden');
       appState.activeWorkout = null;
+      localStorage.removeItem('aurafit_active_workout');
 
       // Display fun Volume Comparison Table result (Section 3.5.2)
       document.getElementById('wfComparisonText').textContent = result.comparison_text;
@@ -1103,6 +1169,71 @@ async function removeSafeFood(id) {
 }
 
 // --- Profile / Settings Tab & Gemini API Key ---
+
+function openEditProfileModal() {
+  const p = appState.profile;
+  if (!p) return;
+
+  document.getElementById('epHeight').value = p.height_cm;
+  document.getElementById('epWeight').value = p.weight_kg;
+  document.getElementById('epAge').value = p.age;
+  document.getElementById('epSex').value = p.sex;
+  document.getElementById('epHrtStatus').checked = Boolean(p.hrt_status);
+  toggleEpHrtFields();
+  if (p.hrt_type) document.getElementById('epHrtType').value = p.hrt_type;
+  if (p.hrt_months) document.getElementById('epHrtMonths').value = p.hrt_months;
+  document.getElementById('epBodyFat').value = (p.body_fat_pct !== null && p.body_fat_pct !== undefined) ? p.body_fat_pct : '';
+  document.getElementById('epActivity').value = p.activity_level;
+  document.getElementById('epGoal').value = p.goal;
+  document.getElementById('epDisplayPref').value = p.display_preference || 'both';
+  document.getElementById('epSafeTracker').checked = Boolean(p.safe_food_tracker_enabled);
+
+  document.getElementById('editProfileModal').classList.remove('hidden');
+}
+
+function toggleEpHrtFields() {
+  const isHrt = document.getElementById('epHrtStatus').checked;
+  const fields = document.getElementById('epHrtFields');
+  if (isHrt) fields.classList.remove('hidden');
+  else fields.classList.add('hidden');
+}
+
+async function handleEditProfileSubmit(e) {
+  e.preventDefault();
+  const bfVal = document.getElementById('epBodyFat').value;
+  const payload = {
+    height_cm: parseFloat(document.getElementById('epHeight').value),
+    weight_kg: parseFloat(document.getElementById('epWeight').value),
+    age: parseInt(document.getElementById('epAge').value),
+    sex: document.getElementById('epSex').value,
+    hrt_status: document.getElementById('epHrtStatus').checked,
+    hrt_type: document.getElementById('epHrtType').value,
+    hrt_months: parseInt(document.getElementById('epHrtMonths').value) || 0,
+    body_fat_pct: bfVal ? parseFloat(bfVal) : null,
+    activity_level: document.getElementById('epActivity').value,
+    goal: document.getElementById('epGoal').value,
+    display_preference: document.getElementById('epDisplayPref').value,
+    safe_food_tracker_enabled: document.getElementById('epSafeTracker').checked,
+  };
+
+  try {
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data.success) {
+      appState.profile = data.profile;
+      closeModal('editProfileModal');
+      populateProfileTab();
+      await refreshDashboard();
+      alert('Profile and metabolic targets successfully saved to database!');
+    }
+  } catch (err) {
+    alert('Failed to update profile: ' + err);
+  }
+}
 
 function populateProfileTab() {
   const p = appState.profile;

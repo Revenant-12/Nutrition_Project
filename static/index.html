@@ -247,6 +247,9 @@
             <p id="workoutTimer" class="text-xs text-amber-400 font-mono mt-0.5">Duration: 00:00</p>
           </div>
           <div class="flex items-center space-x-2">
+            <button onclick="toggleWeightUnit()" id="weightUnitToggleBtn" class="bg-surface-800 hover:bg-slate-700 text-xs text-amber-400 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold uppercase" title="Switch between LBS and KG">
+              Unit: LBS
+            </button>
             <button onclick="openMachineIdentifierModal()" class="bg-surface-800 hover:bg-slate-700 text-xs text-brand-300 px-3 py-1.5 rounded-lg border border-brand-500/30 flex items-center gap-1.5">
               <i data-lucide="camera" class="w-3.5 h-3.5 text-brand-400"></i> Identify Machine
             </button>
@@ -264,6 +267,9 @@
           </button>
           <button onclick="finishActiveWorkout()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/20">
             <i data-lucide="check-circle" class="w-4 h-4"></i> End Workout & Calculate Total
+          </button>
+          <button onclick="cancelActiveWorkout()" class="py-2.5 px-4 bg-surface-850 hover:bg-rose-950/40 text-rose-400 border border-rose-900/40 text-xs font-semibold rounded-xl flex items-center justify-center gap-1">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i> Discard
           </button>
         </div>
       </div>
@@ -959,6 +965,117 @@
           <button onclick="addCustomExerciseToActiveWorkout()" class="px-3 bg-brand-500 text-black font-bold rounded-lg">Add</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 11. EDIT PROFILE MODAL (Section 2.6) -->
+  <div id="editProfileModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto p-4 flex items-center justify-center">
+    <div class="bg-surface-900 border border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl space-y-4 my-8">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+          <i data-lucide="user-cog" class="w-4 h-4 text-brand-400"></i> Edit Profile & Settings
+        </h3>
+        <button onclick="closeModal('editProfileModal')" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="editProfileForm" onsubmit="handleEditProfileSubmit(event)" class="space-y-4 text-xs">
+        <!-- Height / Weight / Age -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Height (cm)</label>
+            <input type="number" step="0.1" id="epHeight" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Weight (kg)</label>
+            <input type="number" step="0.1" id="epWeight" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Age</label>
+            <input type="number" id="epAge" required class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+          </div>
+        </div>
+
+        <!-- Sex & HRT -->
+        <div class="bg-surface-850 p-3 rounded-xl border border-slate-800 space-y-2.5">
+          <label class="block text-slate-300 font-semibold">Sex & Hormone Profile</label>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="epSex" class="bg-surface-900 border border-slate-700 rounded-lg p-2 text-white">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <div class="flex items-center space-x-2 px-2">
+              <input type="checkbox" id="epHrtStatus" onchange="toggleEpHrtFields()" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+              <label for="epHrtStatus" class="text-slate-300">On HRT</label>
+            </div>
+          </div>
+
+          <div id="epHrtFields" class="hidden grid grid-cols-2 gap-2 pt-1 border-t border-slate-800">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-0.5">HRT Type</label>
+              <select id="epHrtType" class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white">
+                <option value="feminizing">Feminizing</option>
+                <option value="masculinizing">Masculinizing</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-0.5">Months on HRT</label>
+              <input type="number" id="epHrtMonths" class="w-full bg-surface-900 border border-slate-700 rounded-lg p-1.5 text-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Fat % -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Body Fat % (Optional)</label>
+          <input type="number" step="0.1" id="epBodyFat" placeholder="Leave empty if unknown" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white" />
+        </div>
+
+        <!-- Activity Level & Goal -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Activity Level</label>
+            <select id="epActivity" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
+              <option value="Sedentary">Sedentary</option>
+              <option value="Lightly active">Lightly active</option>
+              <option value="Moderately active">Moderately active</option>
+              <option value="Active">Active</option>
+              <option value="Very active">Very active</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Goal</label>
+            <select id="epGoal" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
+              <option value="Weight loss">Weight Loss (-20%)</option>
+              <option value="Weight maintenance">Weight Maintenance</option>
+              <option value="Keep current musculature">Keep Musculature</option>
+              <option value="Gain muscle">Gain Muscle (+400 kcal)</option>
+              <option value="Weight gain">Weight Gain (+400 kcal)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Display mode & Safe food tracker -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Display Mode</label>
+            <select id="epDisplayPref" class="w-full bg-surface-850 border border-slate-700 rounded-lg p-2 text-white">
+              <option value="both">Both</option>
+              <option value="calories">Calories Only</option>
+              <option value="macros">Macros Only</option>
+            </select>
+          </div>
+          <div class="flex items-center space-x-2 pt-5">
+            <input type="checkbox" id="epSafeTracker" class="rounded bg-surface-900 border-slate-700 text-brand-500" />
+            <label for="epSafeTracker" class="text-slate-300">Safe Food Tracking</label>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-black font-bold rounded-xl uppercase tracking-wider shadow-md">
+          Save Changes
+        </button>
+      </form>
     </div>
   </div>
 

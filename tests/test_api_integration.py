@@ -8,6 +8,16 @@ class TestApiIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         init_db()
+        from data.db import get_connection
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM meals_logged")
+        c.execute("DELETE FROM workouts")
+        c.execute("DELETE FROM recipes")
+        c.execute("DELETE FROM safe_foods")
+        c.execute("DELETE FROM user_profile")
+        conn.commit()
+        conn.close()
         cls.client = TestClient(app)
 
     def test_01_onboarding_and_profile(self):
@@ -125,7 +135,7 @@ class TestApiIntegration(unittest.TestCase):
         # Log a 150g portion (50% of the batch)
         portion_resp = self.client.post(
             "/api/meals/log-recipe-portion",
-            data={"recipe_id": recipe_id, "portion_weight_g": 150.0}
+            json={"recipe_id": recipe_id, "portion_weight_g": 150.0}
         )
         self.assertEqual(portion_resp.status_code, 200)
         scaled = portion_resp.json()["scaled"]
@@ -146,6 +156,21 @@ class TestApiIntegration(unittest.TestCase):
         data = resp.json()
         self.assertGreaterEqual(data["count"], 1)
         self.assertEqual(data["recipes"][0]["name"], "Chicken Rice Bowl")
+
+    def test_07_delete_workout_and_recipe(self):
+        # Workouts list
+        w_list = self.client.get("/api/workouts").json()["workouts"]
+        self.assertGreaterEqual(len(w_list), 1)
+        w_id = w_list[0]["id"]
+        del_w = self.client.delete(f"/api/workouts/{w_id}").json()
+        self.assertTrue(del_w["success"])
+
+        # Recipes list
+        r_list = self.client.get("/api/recipes").json()["recipes"]
+        self.assertGreaterEqual(len(r_list), 1)
+        r_id = r_list[0]["id"]
+        del_r = self.client.delete(f"/api/recipes/{r_id}").json()
+        self.assertTrue(del_r["success"])
 
 if __name__ == "__main__":
     unittest.main()
