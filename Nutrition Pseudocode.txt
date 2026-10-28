@@ -1,0 +1,151 @@
+﻿1. Program Launch:
+   1. First time launching program
+      1. Put in an input for height, weight, age.
+         1. Prompt for sex
+            1. Add option for being on HRT and select feminizing or masculinizing
+               1. Ask how long on HRT
+      2. Offer an option to input body fat percentage.
+      3. Offer 2 options for activity level. Basic and Advanced
+         1. Basic offers following activity levels: Sedentary (little or no exercise), Lightly active (light exercise/sports 1–3 days/week), Moderately active (moderate exercise/sports 3–5 days/week), Active (hard exercise/sports 6–7 days a week), Very active (very hard exercise/physical job)
+         2. Advanced offers the option to add recent exercise so activity level can be more easily determined.
+      4. Calculate Calories needed
+         1. Calculate BMR (always use body fat % equation when body fat % is included)
+            1. No body fat %
+               1. Men and people on masculinizing HTR for over 12 months, and people on feminizing HTR for less than 12 months: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5
+               2. Women and people on feminizing HRT for over 12 months, and people on masculinizing HRT for less than 12 months. BMR =(10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161 
+            2. Body fat % inputed
+               1. BMR = 370 + (21.6 × lean body mass in kg) 
+         2. Calculate TDEE
+            1. Sedentary (little or no exercise): BMR × 1.2
+            2. Lightly active (light exercise/sports 1–3 days/week): BMR × 1.375
+            3. Moderately active (moderate exercise/sports 3–5 days/week): BMR × 1.55
+            4. Active (hard exercise/sports 6–7 days a week): BMR × 1.725
+            5. Very active (very hard exercise/physical job): BMR × 1.9
+      5. Offer goals
+         1. Weight loss
+            1. Daily Target = TDEE - 20%
+         2. Weight maintenance
+            1. Daily Target = TDEE
+         3. Keep current musculature
+            1. Daily Target = TDEE
+         4. Gain muscle
+            1. Daily Target = TDEE + 300 to 500 kcal
+         5. Weight gain
+            1. Daily Target = TDEE + 300 to 500 kcal
+      6. Activity goal
+         1. Increased activity
+            1. Exercise specific goal (EX: 10 pull ups, 450 leg press)
+         2. Activity maintenance
+      7. Safe food tracker
+         1. Prompt to choose if the user wants the program to track safe foods, this will mean recipes are primarily recommended based on a list of safe foods.
+         2. If activated will be prompted to add safe food list with 3 rankings
+            1. Mostly safe, safe, and always safe
+      8. Choose between displaying calories, macros, or both
+   2. Every other launch
+      1. Display main menu.
+2. Main Menu
+   1. Display calories eaten and remaining for the day
+      1. Resets at 00:00 local time
+   2. Display macro intake today
+      1. Resets at 00:00 local time
+      2. Here are the guidelines for macros
+         1. ii. Macro Target Allocation Logic:
+         2.  Base Reference Weight:
+            1. If body fat % is provided AND (body fat > 30% for men OR > 38% for women): Use Lean Body Mass (LBM) in kg as Reference Weight.
+            2. . Otherwise: Use Total Scale Weight in kg as Reference Weight.
+         3.   Baseline Gram Targets:
+            1. Sedentary: Protein = 0.8 g/kg, Fat = 0.8 g/kg, Carbs = (Daily Calories - (Protein*4 + Fat*9)) / 4
+            2.  Active / Fitness: Protein = 1.6 g/kg, Fat = 0.8 g/kg, Carbs = (Daily Calories - (Protein*4 + Fat*9)) / 4
+            3. Resistance / Strength: Protein = 2.0 g/kg, Fat = 1.0 g/kg, Carbs = (Daily Calories - (Protein*4 + Fat*9)) / 4
+            4.  Endurance: Protein = 1.4 g/kg, Carbs = 6.0 g/kg, Fat = (Daily Calories - (Protein*4 + Carbs*4)) / 9
+            5.  Weight Loss (Hypoenergetic): Protein = 2.2 g/kg, Fat = 0.5 g/kg, Carbs = (Daily Target Calories - (Protein*4 + Fat*9)) / 4
+   3. Button to workout
+   4. Button to add a recipe
+   5. Button to add a meal
+   6. Settings/Profile
+      1. Allows you to change any information inputted during first launch
+3. Workout Button
+   1. Takes user to a workout screen which displays past workouts and a button to add a workout
+   2. Clicking add a workout brings the user to a screen which tracks duration, muscles worked, and weight lifted. There is a button to add exercises.
+   3. Clicking the button to add exercises brings up a list of previous exercises the user has done, but there is also a search functionality where the user can input the name and click a picture of the muscle(s) the exercise is targeting.
+      1. There is also a button to recommend exercises based on the user's goals.
+      2. In the search function there is a camera option so the user can take a picture of the machine if they do not know the name and the program will identify it.
+         1. Find an API for this
+   4. Adding an exercise will add it to the main workout screen where the user can input reps and weight.
+      1. If it is a cardio exercise then duration and distance
+      2. Have an add set button for each exercise that asks reps and weight or distance and duration, have the option to switch between kg and lbs
+         1. Have an add another set, remove set, and a finish exercise button
+   5. There is a button to end the workout. When clicked the workout is ended and tracked items are logged. A comparison of the total weight the user lifted will be displayed. (EX: You lifted 14,000LBS! That’s like lifting an elephant). Have the option to switch between kg and lbs
+      1. Cardio doesn’t contribute to weight lifted
+      2. DEFINE VolumeComparisonTable as list of records: - max_weight: 249, comparison: "an adult giant panda" - max_weight: 499, comparison: "a vending machine" - max_weight: 999, comparison: "a concert grand piano" - max_weight: 1999, comparison: "a thoroughbred racehorse" - max_weight: 3499, comparison: "a classic VW Beetle" - max_weight: 4999, comparison: "a full-grown wild hippo" - max_weight: 7499, comparison: "an adult white rhinoceros" - max_weight: 9999, comparison: "a competition monster truck" - max_weight: 14999, comparison: "an African bush elephant" - max_weight: 19999, comparison: "an adult T-Rex" - max_weight: 29999, comparison: "a London double-decker bus" - max_weight: 44999, comparison: "a fully loaded city fire truck" - max_weight: 59999, comparison: "an Abrams battle tank turret" - max_weight: 79999, comparison: "an adult humpback whale" - max_weight: 99999, comparison: "a fully loaded commercial 18-wheeler" - max_weight: INFINITY, comparison: "the NASA Space Shuttle Orbiter" FUNCTION get_workout_comparison(total_weight_lifted): FOR EACH tier IN VolumeComparisonTable: IF total_weight_lifted <= tier.max_weight: RETURN "You lifted " + total_weight_lifted + " lbs! That's like lifting " + tier.comparison + "!" 
+4. Recipe Button (servings)
+   1. Prompt user if they want to add a recipe or recommend one.
+      1. Add recipe
+         1. Prompts user for ingredients and quantity (grams) in the recipe
+         2. Program calculates macros and calories for the recipe
+         3. Recipe is saved to user’s cookbook
+            1. User is prompted if they want to add recipe/ingredients to safe food tracker.
+         4. User can transition to meal tracker and enter a weight (grams) for the recipe.
+            1. When saving a recipe, calculate: Total Batch Weight (g) = sum of raw ingredients.
+            2.             3. When logging a portion: Portion Consumed (g) / Total Batch Weight (g) = Fraction of total macros to log
+      2. Recommend recipe
+         1. Prompt what type of recipe (EX, desert, breakfast, meal, snack)
+         2. If safe food tracker is implemented user is asked if they prefer safe food recipes.
+            1. Yes
+               1. Ask what level of safe food ranking should be used and if it is a soft or hard  filter.
+               2. Hard filter: Exclude any recipe containing an ingredient outside the selected safety rank (or not in the safe food list).
+               3. Soft filter: Score and sort recipes so that safe-food recipes appear first; if fewer than 3 matches exist, allow recipes containing neutral ingredients.
+                  1. Recommend based on that
+            2. No move onto step 2.
+         3. Ask user if they want to use specific ingredients
+            1. Yes
+               1.  Prompt and get ingredients then recommend recipe with those ingredients
+            2. No move onto step 3
+         4. Ask if familiar recipe is wanted
+            1. Yes:
+               1. Recommend based on regularly used ingredients
+            2. No
+               1. Recomend any
+         5. Recomendations
+            1. Recommendations should fit the users calorie goals and macros
+               1. If user cares more about macros then prioritize macros
+               2. If user cares more about calories then prioritize calories.
+5. Button to add a meal (daily meals)
+   1. Prompts user for ingredients and quantity (grams) in the meal
+      1. Option to scan nutrition label
+         1. Find an API for this
+      2. Option to manually enter nutrition label
+      3. Database of common ingredients/foods
+   2. Program calculates macros and calories for the meal
+   3. Option to copy previous meals
+6. Adaptive Activity & TDEE Rebalancing Engine (Weekly Update):
+  a. Purpose:
+     i. Automatically adjust baseline TDEE to reflect actual logged exercise volume rather than static user-selected activity tiers.
+     ii. Avoid daily fluctuation by using a rolling average and applying adjustments only on a weekly schedule.
+
+
+  b. Workout Energy Logging:
+     i. When a workout session is ended:
+        1. For Cardio: Estimate calories burned based on exercise type, duration, and user weight (or read from distance/time).
+        2. For Strength Training: Estimate calories burned = (duration in minutes) * (user weight in kg * 0.06 kcal/min).
+        3. Save workout calories to the user's daily workout history.
+
+
+  c. Rolling Activity Evaluation (Evaluated every 7 days at 00:00 local time):
+     i. Calculate Average Daily Workout Burn:
+        1. Sum workout calories burned over the previous 14 days.
+        2. Divide total by 14 to get Average Daily Exercise Burn.
+     ii. Compute Calculated TDEE:
+        1. Sedentary Baseline = BMR * 1.2
+        2. Calculated TDEE = Sedentary Baseline + Average Daily Exercise Burn
+     iii. Apply Smoothing / Boundary Limits:
+        1. Compare Calculated TDEE against Current Baseline TDEE.
+        2. Cap the change to a maximum of +/- 150 kcal per week to avoid drastic swings.
+        3. Set New Baseline TDEE = Current Baseline TDEE + Clamped Difference.
+
+
+  d. Macro & Target Re-allocation:
+     i. Re-run Daily Target Calories = New Baseline TDEE + Goal Offset (e.g., -20% for weight loss, +300 kcal for gain).
+     ii. Re-calculate gram targets for Protein, Fat, and Carbs using the updated Target Calories.
+     iii. Display a notification to the user:
+        "Based on your last 2 weeks of workouts, your daily baseline has been adjusted by [+/- X] calories to match your real activity level."
